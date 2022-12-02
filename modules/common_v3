@@ -1,0 +1,68 @@
+#%Module1.0
+source /opt/Modules/extensions/extensions.tcl
+### Set this to the real path later
+set-basedir -root /g/data/v45/dr4292/conda_concept/apps/miniconda3
+set rootdir [ string map [ list /$::package/$::version {} ] $::basedir ]
+
+inhibit-self-conflict
+
+module load singularity
+
+prepend-path PATH $rootdir/condabin
+
+set mymod [file normalize [info script]]
+set mydir [file dirname $mymod]
+set overlay_path [ string map {/conda/ /envs/} $::basedir ].sqsh
+#prepend-path SINGULARITYENV_PREPEND_PATH $::basedir/condabin
+
+set launcher $mymod.d/bin/launcher.sh
+setenv LAUNCHER_SCRIPT $launcher
+
+prepend-path CONTAINER_OVERLAY_PATH $overlay_path
+prepend-path SINGULARITYENV_PREPEND_PATH $::basedir/condabin
+
+if {[module-info mode remove]} {
+    if {$env(CONDA_SHLVL) > 1} {
+        puts stderr "ERROR: Multiple ($::env(CONDA_SHLVL)) conda environments have been loaded, cannot unload with module"
+        puts stderr "ERROR: Try 'conda deactivate' first"
+        break
+    }
+}
+
+# Name of this module's environment
+set condaenv [lindex [split [module-info name] {/}] 1]
+
+# Get the environment variables from 'conda activate'
+set app_env [exec $launcher -o $overlay_path /bin/env -i $mydir/condaenv.sh $rootdir $condaenv]
+
+set lines [split $app_env '\n']
+foreach line $lines {
+    regexp {^([^=]*)=(.*)} $line -> key value
+    if {[lsearch -exact {MODULEPATH PWD _ SHLVL} $key] >= 0} {
+        continue
+    }
+    if {[string match *?PATH $key]} {
+        # A *PATH variable to be prepended with a ':'
+        prepend-path $key $value
+        continue
+    } elseif {[lsearch {_LMFILES_ LOADEDMODULES} $key] >= 0} {
+        # Modulefile stuff that works like a path
+        prepend-path $key $value
+        continue
+    } elseif {[string match PATH $key]} {
+        # PATH itself (strip out the system paths to keep ordering correct)
+        prepend-path SINGULARITYENV_PREPEND_PATH [regsub {:/usr/bin:/bin} $value {}]
+        set path_entries [ split $value ':' ]
+        ### Translate the in-container paths to their out-of-container symlink paths
+        foreach entry $path_entries {
+            if {[string match *$condaenv* $entry]} {
+                prepend-path PATH $mymod.d/bin
+            }
+        }
+        continue
+    } elseif { [string match alias?* $key] } {
+        set-alias [regsub {alias } $key {}] [ string map {\' {}} $value ]
+        continue
+    }
+    setenv $key $value
+}

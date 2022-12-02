@@ -1,0 +1,38 @@
+%setup
+        mkdir -p ${SINGULARITY_ROOTFS}/usr/bin
+        ln -s usr/bin ${SINGULARITY_ROOTFS}/bin
+        ln -s half-root/boot ${SINGULARITY_ROOTFS}/boot
+        ln -s half-root/etc ${SINGULARITY_ROOTFS}/etc
+        ln -s half-root/images ${SINGULARITY_ROOTFS}/images
+        ln -s half-root/initrd ${SINGULARITY_ROOTFS}/initrd
+        ln -s usr/lib ${SINGULARITY_ROOTFS}/lib
+        ln -s usr/lib64 ${SINGULARITY_ROOTFS}/lib64
+        ln -s usr/sbin ${SINGULARITY_ROOTFS}/sbin
+
+        mkdir -p ${SINGULARITY_ROOTFS}/opt
+        ln -s ../half-root/opt/Modules ${SINGULARITY_ROOTFS}/opt/Modules
+        ln -s ../half-root/opt/beegfs ${SINGULARITY_ROOTFS}/opt/beegfs
+        ln -s ../half-root/opt/bin ${SINGULARITY_ROOTFS}/opt/bin
+        ln -s ../half-root/opt/gdrcopy ${SINGULARITY_ROOTFS}/opt/gdrcopy
+        ln -s ../half-root/opt/intel ${SINGULARITY_ROOTFS}/opt/intel
+        ln -s ../half-root/opt/knem-1.1.4.90mlnx1 ${SINGULARITY_ROOTFS}/opt/knem-1.1.4.90mlnx1
+        ln -s ../half-root/opt/mellanox ${SINGULARITY_ROOTFS}/opt/mellanox
+        ln -s ../half-root/opt/pbs ${SINGULARITY_ROOTFS}/opt/pbs
+        ln -s ../half-root/opt/rash ${SINGULARITY_ROOTFS}/opt/rash
+        ln -s ../half-root/opt/rh ${SINGULARITY_ROOTFS}/opt/rh
+
+        ### Mount points for various bits of the image
+        mkdir -p ${SINGULARITY_ROOTFS}/etc
+        mkdir -p ${SINGULARITY_ROOTFS}/half-root
+        mkdir -p ${SINGULARITY_ROOTFS}/local
+        mkdir -p ${SINGULARITY_ROOTFS}/ram
+        mkdir -p ${SINGULARITY_ROOTFS}/run
+        mkdir -p ${SINGULARITY_ROOTFS}/system
+        mkdir -p ${SINGULARITY_ROOTFS}/usr
+
+        ### Mount points for service sockets
+        mkdir -p ${SINGULARITY_ROOTFS}/var/lib/sss
+        mkdir -p ${SINGULARITY_ROOTFS}/var/run/munge
+
+%runscript
+        /usr/bin/bash -l
