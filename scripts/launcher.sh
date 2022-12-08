@@ -36,6 +36,10 @@ while [[ $# -gt 0 ]]; do
             export LAUNCHER_SCRIPT="${2}"
             shift 2
             ;;
+        "--cms_singularity_singularity_path")
+            export SINGULARITY_BINARY_PATH="${2}"
+            shift 2
+            ;;
         *)
             PROG_ARGS+=( "${1}" )
             shift
@@ -56,6 +60,7 @@ else
     cmd_to_run=( "${0}" )
     cmd_to_run+=( "${PROG_ARGS[@]}" )
 fi
+
 if ! [[ -x "${SINGULARITY_BINARY_PATH}" ]]; then
     ### Short circuit detection
     ### In some cases (e.g. mpi processes launched from orterun), launcher will be invoked from

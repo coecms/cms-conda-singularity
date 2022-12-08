@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-script=$( realpath -s "${0}" )
+script=$( realpath "${0}" )
 overrides_bin=$( dirname "${script}" )
 source "${overrides_bin}"/functions.sh
 
@@ -32,5 +32,7 @@ while true; do
     esac
 done
 
-echo $( findreal pbs_tmrsh ) "${stored_args[@]}" $( which launcher.sh ) -s "${SINGULARITY_BINARY_PATH}" -o "${CONTAINER_OVERLAY_PATH}" -p "${PATH}" "${@}"
-exec $( findreal pbs_tmrsh ) "${stored_args[@]}" $( which launcher.sh ) -s "${SINGULARITY_BINARY_PATH}" -o "${CONTAINER_OVERLAY_PATH}" -p "${PATH}" "${@}"
+real_launcher=$( which launcher.sh )
+
+### Pretty much have to re-insert the entire relevant environment for this to work
+exec $( findreal pbs_tmrsh ) "${stored_args[@]}" "${real_launcher}" --cms_singularity_singularity_path "${SINGULARITY_BINARY_PATH}" --cms_singularity_launcher_override "${real_launcher}" --cms_singularity_overlay_path "${CONTAINER_OVERLAY_PATH}" --cms_singularity_in_container_path "${PATH}" "${@}"
