@@ -1,8 +1,8 @@
 #%Module1.0
 source /opt/Modules/extensions/extensions.tcl
 ### Set this to the real path later
-set-basedir -root /g/data/v45/dr4292/conda_concept/apps/miniconda3
-set rootdir [ string map [ list /$::package/$::version {} ] $::basedir ]
+set-basedir -root /g/data/v45/dr4292/conda_concept/apps -package miniconda3 -version envs/$::version
+set rootdir [ string map [ list /envs/$::version {} ] $::basedir ]
 
 inhibit-self-conflict
 
@@ -12,10 +12,10 @@ prepend-path PATH $rootdir/condabin
 
 set mymod [file normalize [info script]]
 set mydir [file dirname $mymod]
+set myscripts [ file normalize $mydir/../../scripts/$::version.d/bin ]
 set overlay_path [ string map {/conda/ /envs/} $::basedir ].sqsh
-#prepend-path SINGULARITYENV_PREPEND_PATH $::basedir/condabin
 
-set launcher $mymod.d/bin/launcher.sh
+set launcher $myscripts/launcher.sh
 setenv LAUNCHER_SCRIPT $launcher
 
 prepend-path CONTAINER_OVERLAY_PATH $overlay_path
@@ -33,7 +33,7 @@ if {[module-info mode remove]} {
 set condaenv [lindex [split [module-info name] {/}] 1]
 
 # Get the environment variables from 'conda activate'
-set app_env [exec $launcher -o $overlay_path /bin/env -i $mydir/condaenv.sh $rootdir $condaenv]
+set app_env [exec $launcher --cms_singularity_overlay_path $overlay_path /bin/env -i $mydir/condaenv.sh $rootdir $condaenv]
 
 set lines [split $app_env '\n']
 foreach line $lines {
@@ -56,7 +56,7 @@ foreach line $lines {
         ### Translate the in-container paths to their out-of-container symlink paths
         foreach entry $path_entries {
             if {[string match *$condaenv* $entry]} {
-                prepend-path PATH $mymod.d/bin
+                prepend-path PATH $myscripts
             }
         }
         continue
@@ -66,3 +66,6 @@ foreach line $lines {
     }
     setenv $key $value
 }
+
+### Extra env to get other things working
+setenv  OMPI_MCA_orte_launch_agent $myscripts/orted
