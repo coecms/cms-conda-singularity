@@ -14,10 +14,7 @@ function in_array() {
 script=$( realpath "${0}" )
 wrapper_bin=$( dirname "${script}" )
 conf_file="${wrapper_bin}"/launcher_conf.sh
-if ! [[ -e "${conf_file}" ]]; then
-    ### Hmmm... we might be being run form a virtual env - find our real path
-    conf_file=$( dirname $( realpath ${script} ) )/launcher_conf.sh
-fi
+
 source "${conf_file}"
 
 ### Add some complicated arguments that are never meant to be used by humans
@@ -64,7 +61,7 @@ if ! [[ -x "${SINGULARITY_BINARY_PATH}" ]]; then
     ### In some cases (e.g. mpi processes launched from orterun), launcher will be invoked from
     ### within the container. The tell-tale sign for this is if /opt/singularity is missing.
     ### The only way this can happen is if we've tried to run something that has come
-    ### from the bin directory in scrpits/env.d/bin/ - the only place these can come from is the
+    ### from the bin directory in scripts/env.d/bin/ - the only place these can come from is the
     ### bin directory of the active conda env, so just reset the path to that but keep the 
     ### original argv[0] so virtual envs work.
     cmd_to_run[0]="${CONDA_BASE}/bin/${cmd_to_run[0]##*/}"
