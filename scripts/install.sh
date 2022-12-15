@@ -10,6 +10,7 @@ export CONDA_BASE=/g/data/v45/dr4292/conda_concept
 export FULLENV=analysis3-22.12
 declare -a rpms_to_remove=( "openssh-clients" "openssh-server" "openssh" )
 declare -a replace_from_apps=( "openmpi/4.1.4" )
+declare -a outside_commands_to_include=( "pbs_tmrsh" )
 
 export OWD="${OWD:-/home/563/dr4292/cms-conda-singularity/scripts}"
 export CONDA_INSTALLATION_PATH=${CONDA_INSTALLATION_PATH:-${CONDA_BASE}/apps/miniconda3}
@@ -37,8 +38,14 @@ pushd "${CONDA_BASE}"/scripts/"${FULLENV}".d/bin
 for i in $( ls "${ENV_INSTALLATION_PATH}"/bin ); do
     ln -s launcher.sh $i
 done
+
+### Add in the outside commands
+for i in "${outside_commands_to_include[@]}"; do
+    ln -s launcher.sh $i
+done
 popd
 
+### Add in the override and config scripts
 pushd "${CONDA_BASE}"/scripts/"${FULLENV}".d/overrides
 for i in ../../overrides/*; do
     ln -s ${i}
