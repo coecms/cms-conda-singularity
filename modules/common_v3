@@ -1,7 +1,7 @@
 #%Module1.0
 source /opt/Modules/extensions/extensions.tcl
 ### Set this to the real path later
-set-basedir -root /g/data/v45/dr4292/conda_concept/apps -package miniconda3 -version envs/$::version
+set-basedir -root /g/data/hh5/admin/conda_concept/apps -package miniconda3 -version envs/$::version
 set rootdir [ string map [ list /envs/$::version {} ] $::basedir ]
 
 inhibit-self-conflict

@@ -1,38 +1,55 @@
 #!/usr/bin/env bash
 
-### Run me inside a singularity container launched with the following command:
-###
-### mkdir ${PBS_JOBFS}/overlay
-### /opt/singularity/bin/singularity -s exec --bind /etc,/haoot,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,$PBS_JOBFS/overlay:/g /g/data/v45/dr4292/singularity/test.sif initialise.sh
-### The important part is the $PBS_JOBFS/overlay:/g mount - we need an empty /g/data for this
+[[ "${SCRIPT_DIR}" ]] && cd "${SCRIPT_DIR}"
 
-export OWD=${PWD}
-export CONDA_BASE=/g/data/v45/dr4292/conda_concept
+source install_config.sh
 
-export CONDA_INSTALLATION_PATH=${CONDA_INSTALLATION_PATH:-$CONDA_BASE/apps/miniconda3}
-mkdir -p "${CONDA_INSTALLATION_PATH%/*}"
-### Placeholder for script that will initialise the base conda environment from scratch
-wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
-bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -b -p "${CONDA_INSTALLATION_PATH}"
-
-. "${CONDA_INSTALLATION_PATH}"/etc/profile.d/conda.sh
-conda install mamba -y
-
+### Derived temp file locations
+export OVERLAY_BASE="${CONDA_TEMP_PATH}"/overlay/
+export CONDA_OUTER_BASE="${OVERLAY_BASE}"/"${CONDA_BASE#/*/}"
 export CONDA_SCRIPT_PATH="${CONDA_BASE}"/scripts
 export CONDA_MODULE_PATH="${CONDA_BASE}"/modules
 
-mkdir -p "${CONDA_SCRIPT_PATH}"/overrides
-cp "${OWD}"/launcher{,_conf}.sh "${CONDA_SCRIPT_PATH}"
-cp "${OWD}"/overrides/* "${CONDA_SCRIPT_PATH}"/overrides
+### Derived installation path
+export CONDA_INSTALLATION_PATH="${CONDA_INSTALLATION_PATH:-$CONDA_BASE/apps/miniconda3}"
 
-mkdir -p "${CONDA_MODULE_PATH}"/conda
-cp "${OWD}"/condaenv.sh "${CONDA_MODULE_PATH}"/conda
-cp "${OWD}"/../modules/common_v3 "${CONDA_MODULE_PATH}"/conda/.common_v3
+function inner() {
 
-conda clean -a -f -y
+    mkdir -p "${CONDA_INSTALLATION_PATH%/*}"
+    bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -b -p "${CONDA_INSTALLATION_PATH}"
 
-pushd "${CONDA_BASE}"
-tar -cf "${OWD}"/conda_base.tar apps modules scripts
+    . "${CONDA_INSTALLATION_PATH}"/etc/profile.d/conda.sh
+    conda install mamba -y
+
+    mkdir -p "${CONDA_SCRIPT_PATH}"/overrides
+    cp "${SCRIPT_DIR}"/launcher{,_conf}.sh "${CONDA_SCRIPT_PATH}"
+    cp "${SCRIPT_DIR}"/overrides/* "${CONDA_SCRIPT_PATH}"/overrides
+
+    mkdir -p "${CONDA_MODULE_PATH}"/conda
+    cp "${SCRIPT_DIR}"/condaenv.sh "${CONDA_MODULE_PATH}"/conda
+    cp "${SCRIPT_DIR}"/../modules/common_v3 "${CONDA_MODULE_PATH}"/conda/.common_v3
+
+    conda clean -a -f -y
+
+}
+
+if [[ "${1}" == '--inner' ]]; then
+    inner
+    exit
+fi
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
+
+mkdir "${PBS_JOBFS}"/overlay
+/opt/singularity/bin/singularity -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" $( realpath $0 ) --inner
+
+### Set permissions
+set_apps_perms "${CONDA_OUTER_BASE}"/{apps,modules,scripts}
+
+rsync --archive --verbose --partial --progress --one-file-system --hard-links --acls -- "${CONDA_OUTER_BASE}"/{apps,modules,scripts} "${CONDA_BASE}"
+
+mkdir -p "${ADMIN_DIR}"
+
+pushd "${CONDA_OUTER_BASE}"
+tar -cf "${SCRIPT_DIR}"/conda_base.tar {apps,modules,scripts}
 popd
-
-### Then untar into the real ${CONDA_INSTALLATION_PATH}
