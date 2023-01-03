@@ -28,6 +28,7 @@ function inner() {
     mkdir -p "${CONDA_MODULE_PATH}"/conda
     cp "${SCRIPT_DIR}"/condaenv.sh "${CONDA_MODULE_PATH}"/conda
     cp "${SCRIPT_DIR}"/../modules/common_v3 "${CONDA_MODULE_PATH}"/conda/.common_v3
+    cp "${SCRIPT_DIR}"/../modules/are       "${CONDA_MODULE_PATH}"/conda/are
 
     conda clean -a -f -y
 

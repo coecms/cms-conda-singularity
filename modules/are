@@ -1,0 +1,15 @@
+#%Module1.0
+source /opt/Modules/extensions/extensions.tcl
+### Set this to the real path later
+set-basedir -root /g/data/hh5/admin/conda_concept/apps -package miniconda3 -version envs
+inhibit-self-conflict
+inhibit-base-envvar
+inhibit-version-envvar
+
+### Loads the conda/analysis3 module, but brings all squashfs into the container
+module load singularity
+module load conda/analysis3
+
+foreach sqshfs [ glob $::basedir/*sqsh ] {
+    prepend-path CONTAINER_OVERLAY_PATH $sqshfs
+}
