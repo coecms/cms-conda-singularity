@@ -3,6 +3,7 @@
 [[ "${SCRIPT_DIR}" ]] && cd "${SCRIPT_DIR}"
 
 source install_config.sh
+source functions.sh
 
 ### Derived temp file locations
 export OVERLAY_BASE="${CONDA_TEMP_PATH}"/overlay
