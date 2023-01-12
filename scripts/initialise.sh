@@ -53,5 +53,5 @@ rsync --archive --verbose --partial --progress --one-file-system --hard-links --
 mkdir -p "${ADMIN_DIR}"
 
 pushd "${CONDA_OUTER_BASE}"
-tar -cf "${SCRIPT_DIR}"/conda_base.tar {apps,modules,scripts}
+tar -cf "${ADMIN_DIR}"/conda_base.tar {apps,modules,scripts}
 popd

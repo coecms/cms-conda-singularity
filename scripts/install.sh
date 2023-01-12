@@ -16,6 +16,11 @@ export MAMBA="${CONDA_INSTALLATION_PATH}"/condabin/mamba
 export CONDA_SCRIPT_PATH="${CONDA_BASE}"/scripts
 export CONDA_MODULE_PATH="${CONDA_BASE}"/modules
 
+if [[ ! -d "${CONDA_INSTALLATION_PATH}" ]]; then
+    echo "Base installation not present - initialising"
+    ./initialise.sh
+fi
+
 function inner() {
 
     source "${CONDA_INSTALLATION_PATH}"/etc/profile.d/conda.sh
@@ -136,7 +141,7 @@ else
     export DO_UPDATE="--install"
 fi
 
-ln -s "${ENV_INSTALLATION_PATH}" "${CONDA_OUTER_BASE}"/apps/miniconda3/envs/
+ln -sf "${ENV_INSTALLATION_PATH}" "${CONDA_OUTER_BASE}"/apps/miniconda3/envs/
 
 /opt/singularity/bin/singularity -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" $( realpath $0 ) --inner "${DO_UPDATE}"
 if [[ $? -ne 0 ]]; then
@@ -209,5 +214,5 @@ fi
 
 ### Archive base env
 pushd "${CONDA_OUTER_BASE}"
-tar -cf "${SCRIPT_DIR}"/conda_base.tar {apps,modules,scripts}
+tar -cf "${ADMIN_DIR}"/conda_base.tar {apps,modules,scripts}
 popd
