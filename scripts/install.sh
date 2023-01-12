@@ -148,6 +148,14 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+### See if the container has been updated
+read newhash fn < <( md5sum "${CONTAINER_PATH}" )
+read oldhash fn < <( md5sum "${CONDA_OUTER_BASE}"/apps/miniconda/etc/"${CONTAINER_PATH##*/}" )
+if [[ "${oldhash}" != "${newhash}" ]]; then
+    echo "Container update detected. Copying in new container"
+    cp "${CONTAINER_PATH}" "${CONDA_OUTER_BASE}"/apps/miniconda/etc/"${CONTAINER_PATH##*/}"
+fi
+
 ### Do not package conda_base.tar or the updated env if there was no change
 if [[ "${DO_UPDATE}" == "--update" ]] && diff -q deployed.yml deployed.old.yml; then
     exit

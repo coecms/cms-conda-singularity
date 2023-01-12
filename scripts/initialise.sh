@@ -45,6 +45,8 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
 mkdir "${PBS_JOBFS}"/overlay
 /opt/singularity/bin/singularity -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" $( realpath $0 ) --inner
 
+### Copy in container
+cp "${CONTAINER_PATH}" "${CONDA_OUTER_BASE}"/apps/miniconda3/etc/
 ### Set permissions
 set_apps_perms "${CONDA_OUTER_BASE}"/{apps,modules,scripts}
 
