@@ -32,7 +32,7 @@ while true; do
     esac
 done
 
-real_launcher=$( which launcher.sh )
+real_launcher=$( type -p launcher.sh )
 
 ### Pretty much have to re-insert the entire relevant environment for this to work
 exec $( findreal pbs_tmrsh ) "${stored_args[@]}" "${real_launcher}" --cms_singularity_singularity_path "${SINGULARITY_BINARY_PATH}" --cms_singularity_launcher_override "${real_launcher}" --cms_singularity_overlay_path "${CONTAINER_OVERLAY_PATH}" --cms_singularity_in_container_path "${PATH}" "${@}"

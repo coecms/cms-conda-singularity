@@ -1,6 +1,6 @@
 #%Module1.0
 source /opt/Modules/extensions/extensions.tcl
-### Set this to the real path later
+
 set-basedir -root __CONDA_BASE__/__APPS_SUBDIR__ -package __CONDA_INSTALL_BASENAME__ -version envs/$::version
 set rootdir [ string map [ list /envs/$::version {} ] $::basedir ]
 
