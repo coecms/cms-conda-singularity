@@ -49,11 +49,13 @@ mkdir "${PBS_JOBFS}"/overlay
 ### Copy in container
 cp "${CONTAINER_PATH}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/
 ### Set permissions
-set_apps_perms "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${CONDA_OUTER_BASE}"/"${SCRIPT_SUBDIR}" "${CONDA_OUTER_BASE}"/"${MODULE_SUBDIR}"
+set_apps_perms "${CONDA_OUTER_BASE}"
 
 rsync --archive --verbose --partial --progress --one-file-system --hard-links --acls --relative -- "${CONDA_OUTER_BASE}"/./"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${CONDA_OUTER_BASE}"/./"${SCRIPT_SUBDIR}" "${CONDA_OUTER_BASE}"/./"${MODULE_SUBDIR}" "${CONDA_BASE}"
 
 mkdir -p "${ADMIN_DIR}"
+chgrp "${APPS_OWNERS_GROUP}" "${ADMIN_DIR}"
+chmod g=u+s,o= "${ADMIN_DIR}"
 
 pushd "${CONDA_OUTER_BASE}"
 tar -cf "${ADMIN_DIR}"/conda_base.tar "${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${SCRIPT_SUBDIR}" "${MODULE_SUBDIR}"

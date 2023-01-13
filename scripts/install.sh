@@ -185,7 +185,7 @@ rm "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/"${FU
 ln -s /opt/conda/"${FULLENV}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/
 
 ### Set permissions on base environment
-set_apps_perms "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${CONDA_OUTER_BASE}"/"${MODULE_SUBDIR}" "${CONDA_OUTER_BASE}"/"${SCRIPT_SUBDIR}"
+set_apps_perms "${CONDA_OUTER_BASE}"
 
 echo "Sync across any changes in the base conda environment"
 rsync --archive --verbose --partial --progress --one-file-system --itemize-changes --hard-links --acls --relative -- "${CONDA_OUTER_BASE}"/./"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${CONDA_OUTER_BASE}"/./"${MODULE_SUBDIR}" "${CONDA_OUTER_BASE}"/./"${SCRIPT_SUBDIR}" "${CONDA_BASE}"
