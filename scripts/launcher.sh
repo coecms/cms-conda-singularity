@@ -67,7 +67,7 @@ fi
 ### runs in the container. If we haven't been directly invoked, this does
 ### nothing
 myenv=$( basename "${wrapper_bin%/*}" ".d" )
-module prepend-path CONTAINER_OVERLAY_PATH "${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh
+[[ :"${CONTAINER_OVERLAY_PATH}": =~ :"${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh: ]] || export CONTAINER_OVERLAY_PATH="${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh:${CONTAINER_OVERLAY_PATH}
 export CONDA_BASE="${CONDA_BASE_ENV_PATH}/envs/${myenv}"
 
 if ! [[ -x "${SINGULARITY_BINARY_PATH}" ]]; then
