@@ -1,7 +1,7 @@
 #%Module1.0
 source /opt/Modules/extensions/extensions.tcl
 ### Set this to the real path later
-set-basedir -root /g/data/hh5/admin/conda_concept/apps -package miniconda3 -version envs/$::version
+set-basedir -root __CONDA_BASE__/__APPS_SUBDIR__ -package __CONDA_INSTALL_BASENAME__ -version envs/$::version
 set rootdir [ string map [ list /envs/$::version {} ] $::basedir ]
 
 inhibit-self-conflict
@@ -12,11 +12,10 @@ prepend-path PATH $rootdir/condabin
 
 set mymod [file normalize [info script]]
 set mydir [file dirname $mymod]
-set myscripts [ file normalize $mydir/../../scripts/$::version.d/bin ]
+set myscripts [ file normalize __CONDA_BASE__/__SCRIPT_SUBDIR__/$::version.d/bin ]
 set overlay_path [ string map {/conda/ /envs/} $::basedir ].sqsh
 
 set launcher $myscripts/launcher.sh
-setenv LAUNCHER_SCRIPT $launcher
 
 prepend-path CONTAINER_OVERLAY_PATH $overlay_path
 prepend-path SINGULARITYENV_PREPEND_PATH $::basedir/condabin

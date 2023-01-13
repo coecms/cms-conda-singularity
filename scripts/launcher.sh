@@ -5,14 +5,13 @@ function in_array() {
     ### Necessary because [[ libab =~ liba ]] returns true
     declare -a allargs=( "$@" )
     finalarg=${allargs[$(( ${#allargs[@]} - 1 ))]}
-    for (( j=0; j<$(( ${#allargs[@]} - 2 )); j++ )); do
+    for (( j=0; j<$(( ${#allargs[@]} - 1 )); j++ )); do
         [[ "${allargs[$j]}" == "${finalarg}" ]] && return 0
     done
     return 1
 }
 
-script=$( realpath "${0}" )
-wrapper_bin=$( dirname "${script}" )
+wrapper_bin=$( realpath "${0%/*}" )
 conf_file="${wrapper_bin}"/launcher_conf.sh
 
 source "${conf_file}"
@@ -49,8 +48,10 @@ done
 
 if ! [[ "${SINGULARITY_BINARY_PATH}" ]]; then
     module load singularity
-    export SINGULARITY_BINARY_PATH=$( which singularity )
+    export SINGULARITY_BINARY_PATH=$( type -p singularity )
 fi
+
+[[ "${LAUNCHER_SCRIPT}" ]] || export LAUNCHER_SCRIPT="${0%/*}"/launcher.sh
 
 ### Allow invoking launcher directly with arbitrary commands
 if [[ "${0}" == "${LAUNCHER_SCRIPT}" ]]; then
@@ -60,6 +61,14 @@ else
     cmd_to_run=( "${0}" )
     cmd_to_run+=( "${PROG_ARGS[@]}" )
 fi
+
+### Handle the case where we've been invoked directly. Make sure the container
+### we need is on path, and that CONDA_BASE is set so that the right thing
+### runs in the container. If we haven't been directly invoked, this does
+### nothing
+myenv=$( basename "${wrapper_bin%/*}" ".d" )
+module prepend-path CONTAINER_OVERLAY_PATH "${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh
+export CONDA_BASE="${CONDA_BASE_ENV_PATH}/envs/${myenv}"
 
 if ! [[ -x "${SINGULARITY_BINARY_PATH}" ]]; then
     ### Short circuit detection

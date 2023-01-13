@@ -4,9 +4,14 @@ export ADMIN_DIR="${ADMIN_DIR:-${CONDA_BASE}/admin}"
 export CONDA_TEMP_PATH="${PBS_JOBFS:-${CONDA_TEMP_PATH}}"
 export SCRIPT_DIR="${SCRIPT_DIR:-$PWD}"
 
-### Derived locations
-export CONDA_SCRIPT_PATH="${CONDA_BASE}"/scripts
-export CONDA_MODULE_PATH="${CONDA_BASE}"/modules
+export SCRIPT_SUBDIR="apps/conda-scripts"
+export MODULE_SUBDIR="modules"
+export APPS_SUBDIR="apps"
+export CONDA_INSTALL_BASENAME="miniconda3"
+
+### Derived locations - extra '.' for arcane rsync magic
+export CONDA_SCRIPT_PATH="${CONDA_BASE}"/./"${SCRIPT_SUBDIR}"
+export CONDA_MODULE_PATH="${CONDA_BASE}"/./"${MODULE_SUBDIR}"
 
 ### Groups
 export APPS_USERS_GROUP=hh5

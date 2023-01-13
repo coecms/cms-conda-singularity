@@ -63,3 +63,22 @@ function symlink_atomic_update() {
 
     set_apps_perms "${link_name}"
 }
+
+function copy_and_replace() {
+    ### Copies the file in $1 to the location in $2 and replaces any occurence
+    ### of __${3}__, __${4}__... with the contents of those environment variables
+    in="${1}"
+    out="${2}"
+    shift 2
+    sedstr=''
+    for arg in "$@"; do
+        sedstr="${sedstr}s:__${arg}__:${!arg}:g;"
+    done
+    
+    if [[ "${sedstr}" ]]; then
+        sed "${sedstr}" < "${in}" > "${out}"
+    else
+        cp "${in}" "${out}"
+    fi
+
+}
