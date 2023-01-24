@@ -38,17 +38,18 @@ function write_modulerc() {
     unstable="${2}"
     env_name="${3}"
     module_path="${4}"
+    module_name="${5}"
 
-    cat<<EOF > "${module_path}/conda/.modulerc"
+    cat<<EOF > "${module_path}"/"${module_name}"/.modulerc
 #%Module1.0
 
-module-version conda/${stable} analysis ${env_name} default
-module-version conda/${unstable} ${env_name}-unstable
+module-version ${module_name}/${stable} analysis ${env_name} default
+module-version ${module_name}/${unstable} ${env_name}-unstable
 
-module-version conda/analysis27-18.10 analysis27
+module-version ${module_name}/analysis27-18.10 analysis27
 EOF
 
-    set_apps_perms "${module_path}/conda/.modulerc"
+    set_apps_perms "${module_path}/${module_name}/.modulerc"
 
 }
 

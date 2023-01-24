@@ -1,17 +1,19 @@
 ### Settings to control installation path e.g. for test installs
 export CONDA_BASE="${CONDA_BASE:-/g/data/hh5/admin/conda_concept}"
-export ADMIN_DIR="${ADMIN_DIR:-${CONDA_BASE}/admin}"
+export ADMIN_DIR="${ADMIN_DIR:-/g/data/hh5/admin/conda_concept/admin}"
 export CONDA_TEMP_PATH="${PBS_JOBFS:-${CONDA_TEMP_PATH}}"
 export SCRIPT_DIR="${SCRIPT_DIR:-$PWD}"
 
 export SCRIPT_SUBDIR="apps/conda-scripts"
 export MODULE_SUBDIR="modules"
 export APPS_SUBDIR="apps"
-export CONDA_INSTALL_BASENAME="miniconda3"
+export CONDA_INSTALL_BASENAME="cms_conda"
+export MODULE_NAME="conda_concept"
 
 ### Derived locations - extra '.' for arcane rsync magic
 export CONDA_SCRIPT_PATH="${CONDA_BASE}"/./"${SCRIPT_SUBDIR}"
 export CONDA_MODULE_PATH="${CONDA_BASE}"/./"${MODULE_SUBDIR}"
+export JOB_LOG_DIR="${ADMIN_DIR}"/logs
 
 ### Groups
 export APPS_USERS_GROUP=hh5
