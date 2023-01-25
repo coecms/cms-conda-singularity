@@ -12,7 +12,7 @@ jobs:
       - name: Set environment
         run: |
           while read line; do
-            [[ $line =~ '^#' ]] && continue
+            [[ $line =~ ^# ]] && continue
             [[ $line =~ declare ]] && continue
             [[ $line ]] && echo $line >> $GITHUB_ENV
           done < scripts/install_config.sh
