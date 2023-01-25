@@ -1,0 +1,26 @@
+name: Deploy conda env
+on:
+  push:
+    branches: main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+      steps:
+      - name: Checkout repository and set environment
+        ### Latest at time of writing
+        uses: actions/checkout@v3.3.0
+        run: |
+          while read line; do
+            [[ $line =~ '^#' ]] && continue
+            [[ $line ]] && echo $line >> $GITHUB_ENV
+          done < scripts/install_config.sh
+      - name: Deploy conda environment
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: gadi.nci.org.au
+          username: ${{secrets.GADI_USER}}
+          key: ${{secrets.DEPLOY_KEY}}
+          envs: JOB_LOG_DIR,BUILD_STAGE_DIR
+          script: |
+            export SCRIPT_DIR="${BUILD_STAGE_DIR}"/"${SHA}"/scripts
+            "${SCRIPT_DIR}"/deploy.sh

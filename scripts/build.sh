@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eu
 
 [[ "${SCRIPT_DIR}" ]] && cd "${SCRIPT_DIR}"
 
@@ -13,11 +14,6 @@ export ENV_INSTALLATION_PATH="${CONDA_TEMP_PATH}"/squashfs-root/opt/conda/"${FUL
 ### Derived installation paths
 export CONDA_INSTALLATION_PATH=${CONDA_INSTALLATION_PATH:-${CONDA_BASE}/./${APPS_SUBDIR}/${CONDA_INSTALL_BASENAME}}
 export MAMBA="${CONDA_INSTALLATION_PATH}"/condabin/mamba
-
-if [[ ! -d "${CONDA_INSTALLATION_PATH}" ]]; then
-    echo "Base installation not present - initialising"
-    ./initialise.sh
-fi
 
 function inner() {
 
@@ -104,29 +100,24 @@ function inner() {
 
     conda clean -a -f -y
 
-    ### For reasons I can't figure out, py.test hangs on exit due to not being able to
-    ### clean up one of its threads when run in singularity. To get around this, background
-    ### py.test and read its status from an output file, rather than using the exit status
-    rm -f "${TEST_OUT_FILE}"
-    py.test -s --junitxml "${TEST_OUT_FILE}" &
-    test_pid=$!
-
-    while ! [[ -e "${TEST_OUT_FILE}" ]]; do sleep 5; done
-
-    [[ -e /proc/"${test_pid}" ]] && kill -15 "${test_pid}"
-    wait
-
 }
 
-if [[ "${1}" == '--inner' ]]; then
-    inner "${2}"
-    exit 0
+if [[ "$#" -gt 1 ]]; then
+    if [[ "${1}" == '--inner' ]]; then
+        inner "${2}"
+        exit 0
+    fi
 fi
 
-mkdir -p "${CONDA_OUTER_BASE}"
-echo "Copying base conda installation to ${CONDA_TEMP_PATH}"
-rsync --recursive --links --perms --times --specials --partial --one-file-system --hard-links --acls --relative --exclude=*.sqsh -- "${CONDA_INSTALLATION_PATH}" "${CONDA_SCRIPT_PATH}" "${CONDA_MODULE_PATH}" "${CONDA_OUTER_BASE}"/
-echo "Done"
+if [[ -d "${CONDA_INSTALLATION_PATH}" ]]; then
+    mkdir -p "${CONDA_OUTER_BASE}"
+    echo "Copying base conda installation to ${CONDA_TEMP_PATH}"
+    rsync --recursive --links --perms --times --specials --partial --one-file-system --hard-links --acls --relative --exclude=*.sqsh -- "${CONDA_INSTALLATION_PATH}" "${CONDA_SCRIPT_PATH}" "${CONDA_MODULE_PATH}" "${CONDA_OUTER_BASE}"/
+    echo "Done"
+else
+    echo "Base installation not present - initialising"
+    ./initialise.sh
+fi
 
 if [[ -e  "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}.sqsh" ]]; then
     pushd "${CONDA_TEMP_PATH}"
@@ -154,16 +145,10 @@ if [[ "${oldhash}" != "${newhash}" ]]; then
     cp "${CONTAINER_PATH}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}"
 fi
 
-### Do not package conda_base.tar or the updated env if there was no change
 if [[ "${DO_UPDATE}" == "--update" ]] && diff -q deployed.yml deployed.old.yml; then
-    exit
-fi
-
-read errors failures < <( python3 -c 'import xml.etree.ElementTree as ET; import sys; t=ET.parse(sys.argv[1]); print(t.getroot().getchildren()[0].get("errors") + " " + t.getroot().getchildren()[0].get("failures"))' "${TEST_OUT_FILE}" )
-
-if [[ "${errors}" -gt 0 ]] || [[ "${failures}" -gt 0 ]]; then
-    echo "TESTS FAILED - discarding update"
-    exit
+    echo "No changes detected in the environment, discarding update"
+    cp deployed.yml deployed.old.yml "${BUILD_STAGE_DIR}"/
+    exit 0
 fi
 
 
@@ -178,7 +163,8 @@ chgrp -R "${APPS_USERS_GROUP}" squashfs-root
 
 mksquashfs squashfs-root "${FULLENV}".sqsh -b 1M -no-recovery -noI -noD -noF -noX -processors 8 2>/dev/null
 ### Stage this file and rename when we're ready
-cp "${FULLENV}".sqsh "${ADMIN_DIR}"/"${FULLENV}".sqsh.tmp
+cp "${FULLENV}".sqsh "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
+set_apps_perms "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
 popd
 
 rm "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/"${FULLENV}"
@@ -187,40 +173,10 @@ ln -s /opt/conda/"${FULLENV}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_IN
 ### Set permissions on base environment
 set_apps_perms "${CONDA_OUTER_BASE}"
 
-echo "Sync across any changes in the base conda environment"
-rsync --archive --verbose --partial --progress --one-file-system --itemize-changes --hard-links --acls --relative -- "${CONDA_OUTER_BASE}"/./"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${CONDA_OUTER_BASE}"/./"${MODULE_SUBDIR}" "${CONDA_OUTER_BASE}"/./"${SCRIPT_SUBDIR}" "${CONDA_BASE}"
-
-echo "Make sure anything deleted from the base conda environment is also deleted in the prod copy"
-rsync --archive --verbose --partial --progress --one-file-system --itemize-changes --hard-links --acls --relative --delete --exclude=*.sqsh -- "${CONDA_OUTER_BASE}"/./"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${CONDA_BASE}"
-
-echo "Make sure anything deleted from the scripts directory is also deleted from the prod copy"
-rsync --archive --verbose --partial --progress --one-file-system --itemize-changes --hard-links --acls --relative --delete -- "${CONDA_OUTER_BASE}"/./"${SCRIPT_SUBDIR}" "${CONDA_BASE}"
-
-[[ "${DO_UPDATE}" == "--update" ]] && cp "${CONDA_INSTALLATION_PATH}"/envs/"${FULLENV}".sqsh "${ADMIN_DIR}"/"${FULLENV}".sqsh.bak
-set_apps_perms "${ADMIN_DIR}"/"${FULLENV}".sqsh.tmp
-mv "${ADMIN_DIR}"/"${FULLENV}".sqsh.tmp "${CONDA_INSTALLATION_PATH}"/envs/"${FULLENV}".sqsh
-
-### Update stable/unstable if necessary
-CURRENT_STABLE=$( get_aliased_module "${MODULE_NAME}"/analysis "${CONDA_MODULE_PATH}" )
-NEXT_STABLE="${ENVIRONMENT}-${STABLE_VERSION}"
-CURRENT_UNSTABLE=$( get_aliased_module "${MODULE_NAME}"/analysis3-unstable "${CONDA_MODULE_PATH}" )
-NEXT_UNSTABLE="${ENVIRONMENT}-${UNSTABLE_VERSION}"
-
-if ! [[ "${CURRENT_STABLE}" == "${MODULE_NAME}/${NEXT_STABLE}" ]]; then
-    echo "Updating stable environment to ${NEXT_STABLE}"
-    write_modulerc "${NEXT_STABLE}" "${NEXT_UNSTABLE}" "${ENVIRONMENT}" "${CONDA_MODULE_PATH}" "${MODULE_NAME}"
-    symlink_atomic_update "${CONDA_INSTALLATION_PATH}"/envs/"${ENVIRONMENT}" "${NEXT_STABLE}"
-    symlink_atomic_update "${CONDA_SCRIPT_PATH}"/"${ENVIRONMENT}".d "${NEXT_STABLE}".d
-fi
-if ! [[ "${CURRENT_UNSTABLE}" == "${MODULE_NAME}/${NEXT_UNSTABLE}" ]]; then
-    echo "Updating unstable environment to ${NEXT_UNSTABLE}"
-    write_modulerc "${NEXT_STABLE}" "${NEXT_UNSTABLE}" "${ENVIRONMENT}" "${CONDA_MODULE_PATH}" "${MODULE_NAME}"
-    symlink_atomic_update "${CONDA_INSTALLATION_PATH}"/envs/"${ENVIRONMENT}"-unstable "${NEXT_UNSTABLE}"
-    symlink_atomic_update "${CONDA_SCRIPT_PATH}"/"${ENVIRONMENT}"-unstable.d "${NEXT_UNSTABLE}".d
-fi
-
-
 ### Archive base env
 pushd "${CONDA_OUTER_BASE}"
-tar -cf "${ADMIN_DIR}"/conda_base.tar "${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${MODULE_SUBDIR}" "${SCRIPT_SUBDIR}"
+### WARNING: Non-standard tar extension: --acls
+tar --acls -cf "${BUILD_STAGE_DIR}"/conda_base.tar "${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${MODULE_SUBDIR}" "${SCRIPT_SUBDIR}"
 popd
+
+cp deployed.yml deployed.old.yml "${BUILD_STAGE_DIR}"/

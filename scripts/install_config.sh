@@ -4,7 +4,7 @@ export ADMIN_DIR="${ADMIN_DIR:-/g/data/hh5/admin/conda_concept/admin}"
 export CONDA_TEMP_PATH="${PBS_JOBFS:-${CONDA_TEMP_PATH}}"
 export SCRIPT_DIR="${SCRIPT_DIR:-$PWD}"
 
-export SCRIPT_SUBDIR="apps/conda-scripts"
+export SCRIPT_SUBDIR="apps/conda-scripts-test"
 export MODULE_SUBDIR="modules"
 export APPS_SUBDIR="apps"
 export CONDA_INSTALL_BASENAME="cms_conda"
@@ -14,6 +14,7 @@ export MODULE_NAME="conda_concept"
 export CONDA_SCRIPT_PATH="${CONDA_BASE}"/./"${SCRIPT_SUBDIR}"
 export CONDA_MODULE_PATH="${CONDA_BASE}"/./"${MODULE_SUBDIR}"
 export JOB_LOG_DIR="${ADMIN_DIR}"/logs
+export BUILD_STAGE_DIR=/scratch/hh5/dr4292/conda_staging/staging
 
 ### Groups
 export APPS_USERS_GROUP=hh5

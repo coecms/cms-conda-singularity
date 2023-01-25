@@ -1,0 +1,63 @@
+name: Build and test conda env
+on: pull_request
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and set environment
+        ### Latest at time of writing
+        uses: actions/checkout@v3.3.0
+        run: |
+          while read line; do
+            [[ $line =~ ^# ]] && continue
+            [[ $line =~ declare ]] && continue
+            [[ $line ]] && echo $line >> $GITHUB_ENV
+          done < scripts/install_config.sh
+      - name: Create Admin dirs on Gadi
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: gadi.nci.org.au
+          username: ${{secrets.GADI_USER}}
+          key: ${{secrets.DEPLOY_KEY}}
+          envs: ADMIN_DIR,JOB_LOG_DIR,BUILD_STAGE_DIR,APPS_USER_GROUP,APPS_OWNERS_GROUP
+          script: |
+            mkdir -p $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
+            chgrp -R $APPS_USERS_GROUP $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
+            chmod -R g=u+s,o= $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
+            setfacl -R -m g:$APPS_USERS_GROUP:---,g:$APPS_OWNERS_GROUP:rwX,d:g:$APPS_USERS_GROUP:---,d:g:$APPS_OWNERS_GROUP:rwX $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
+      - name: Sync repository to Gadi
+        ### Latest at time of writing
+        uses: up9cloud/action-rsync@1.3
+        env:
+          HOST: gadi.nci.org.au
+          TARGET: "${BUILD_STAGE_DIR}"/repo/
+          KEY: ${{secrets.DEPLOY_KEY}}
+          USER: ${{secrets.GADI_USER}}
+      - name: Build environment
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: gadi.nci.org.au
+          username: ${{secrets.GADI_USER}}
+          key: ${{secrets.DEPLOY_KEY}}
+          envs: JOB_LOG_DIR,BUILD_STAGE_DIR
+          script: |
+            cd $JOB_LOG_DIR
+            export SCRIPT_DIR="${BUILD_STAGE_DIR}"/repo/scripts
+            jobid=$( qsub -N build_conda -lncpus=1,mem=20GB,walltime=2:00:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -q copyq -Wblock=true "${SCRIPT_DIR}"/build.sh )
+            cat build_conda.o"${jobid}"
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+      steps:
+      - name: Test environment
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: gadi.nci.org.au
+          username: ${{secrets.GADI_USER}}
+          key: ${{secrets.DEPLOY_KEY}}
+          envs: JOB_LOG_DIR,BUILD_STAGE_DIR
+          script: |
+            cd $JOB_LOG_DIR
+            export SCRIPT_DIR="${BUILD_STAGE_DIR}"/repo/scripts
+            jobid=$( qsub -N test_conda -lncpus=4,mem=20GB,walltime=0:30:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -Wblock=true "${SCRIPT_DIR}"/test.sh )
+            cat test_conda.o"${jobid}"
