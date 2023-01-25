@@ -18,7 +18,7 @@ jobs:
           done < scripts/install_config.sh
       - name: Sync repository to Gadi
         ### Latest at time of writing
-        uses: up9cloud/action-rsync@1.3
+        uses: up9cloud/action-rsync@v1.3
         env:
           HOST: gadi.nci.org.au
           TARGET: $BUILD_STAGE_DIR/repo/

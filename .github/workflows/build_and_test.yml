@@ -28,7 +28,7 @@ jobs:
             setfacl -R -m g:$APPS_USERS_GROUP:---,g:$APPS_OWNERS_GROUP:rwX,d:g:$APPS_USERS_GROUP:---,d:g:$APPS_OWNERS_GROUP:rwX $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
       - name: Sync repository to Gadi
         ### Latest at time of writing
-        uses: up9cloud/action-rsync@1.3
+        uses: up9cloud/action-rsync@v1.3
         env:
           HOST: gadi.nci.org.au
           TARGET: $BUILD_STAGE_DIR/repo/
