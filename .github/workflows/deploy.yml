@@ -21,7 +21,7 @@ jobs:
         uses: up9cloud/action-rsync@v1.3
         env:
           HOST: gadi.nci.org.au
-          TARGET: $BUILD_STAGE_DIR/repo/
+          TARGET: ~/repo/
           KEY: ${{secrets.DEPLOY_KEY}}
           USER: ${{secrets.GADI_USER}}
       - name: Deploy conda environment
@@ -32,5 +32,5 @@ jobs:
           key: ${{secrets.DEPLOY_KEY}}
           envs: JOB_LOG_DIR,BUILD_STAGE_DIR
           script: |
-            export SCRIPT_DIR="${BUILD_STAGE_DIR}"/repo/scripts
+            export SCRIPT_DIR=~/repo/scripts
             "${SCRIPT_DIR}"/deploy.sh
