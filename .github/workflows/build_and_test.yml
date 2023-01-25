@@ -4,9 +4,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository and set environment
+      - name: Checkout repository
         ### Latest at time of writing
         uses: actions/checkout@v3.3.0
+      - name: Set environment
         run: |
           while read line; do
             [[ $line =~ ^# ]] && continue
@@ -30,7 +31,7 @@ jobs:
         uses: up9cloud/action-rsync@1.3
         env:
           HOST: gadi.nci.org.au
-          TARGET: "${BUILD_STAGE_DIR}"/repo/
+          TARGET: $BUILD_STAGE_DIR/repo/
           KEY: ${{secrets.DEPLOY_KEY}}
           USER: ${{secrets.GADI_USER}}
       - name: Build environment
@@ -48,7 +49,7 @@ jobs:
   test:
     needs: build
     runs-on: ubuntu-latest
-      steps:
+    steps:
       - name: Test environment
         uses: appleboy/ssh-action@v0.1.7
         with:

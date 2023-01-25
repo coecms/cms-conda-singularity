@@ -6,12 +6,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository and set environment
+      - name: Checkout repository
         ### Latest at time of writing
         uses: actions/checkout@v3.3.0
+      - name: Set environment
         run: |
           while read line; do
             [[ $line =~ '^#' ]] && continue
+            [[ $line =~ declare ]] && continue
             [[ $line ]] && echo $line >> $GITHUB_ENV
           done < scripts/install_config.sh
       - name: Deploy conda environment
