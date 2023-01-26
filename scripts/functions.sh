@@ -18,7 +18,7 @@ function set_apps_perms() {
         if [[ -d "${arg}" ]]; then
             chgrp -R "${APPS_USERS_GROUP}" "${arg}"
             chmod -R g=u-w,o= "${arg}"
-            chmod -R g+s "${arg}"
+            chmod g+s "${arg}"
             setfacl -R -m g:"${APPS_OWNERS_GROUP}":rwX,d:g:"${APPS_OWNERS_GROUP}":rwX "${arg}"
         elif [[ -f "${arg}" ]]; then
             ### reset any existing acls
@@ -43,7 +43,8 @@ function set_admin_perms() {
     for arg in "$@"; do
         if [[ -d "${arg}" ]]; then
             chgrp -R "${APPS_USERS_GROUP}" "${arg}"
-            chmod -R g=u+s,o= "${arg}"
+            chmod -R g=u,o= "${arg}"
+            chmod g+s "${arg}"
             setfacl -R -m g:"${APPS_USERS_GROUP}":---,g:"${APPS_OWNERS_GROUP}":rwX,d:g:"${APPS_USERS_GROUP}":---,d:g:"${APPS_OWNERS_GROUP}":rwX "${arg}"
         elif [[ -f "${arg}" ]]; then
             ### reset any existing acls
