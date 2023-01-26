@@ -9,19 +9,12 @@ jobs:
       - name: Checkout repository
         ### Latest at time of writing
         uses: actions/checkout@v3.3.0
-      - name: Set environment
-        run: |
-          while read line; do
-            [[ $line =~ ^# ]] && continue
-            [[ $line =~ declare ]] && continue
-            [[ $line ]] && echo $line >> $GITHUB_ENV
-          done < scripts/install_config.sh
       - name: Sync repository to Gadi
         ### Latest at time of writing
         uses: up9cloud/action-rsync@v1.3
         env:
           HOST: gadi.nci.org.au
-          TARGET: ~/repo/
+          TARGET: ${{secrets.GADI_REPO_PATH}}
           KEY: ${{secrets.DEPLOY_KEY}}
           USER: ${{secrets.GADI_USER}}
       - name: Deploy conda environment
@@ -30,7 +23,7 @@ jobs:
           host: gadi.nci.org.au
           username: ${{secrets.GADI_USER}}
           key: ${{secrets.DEPLOY_KEY}}
-          envs: JOB_LOG_DIR,BUILD_STAGE_DIR
           script: |
-            export SCRIPT_DIR=~/repo/scripts
+            export SCRIPT_DIR=${{secrets.GADI_REPO_PATH}}/scripts
+            eval $( grep BUILD_STAGE_DIR $SCRIPT_DIR/install_config.sh )
             "${SCRIPT_DIR}"/deploy.sh

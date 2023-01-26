@@ -7,45 +7,44 @@ jobs:
       - name: Checkout repository
         ### Latest at time of writing
         uses: actions/checkout@v3.3.0
-      - name: Set environment
-        run: |
-          while read line; do
-            [[ $line =~ ^# ]] && continue
-            [[ $line =~ declare ]] && continue
-            [[ $line ]] && echo $line >> $GITHUB_ENV
-          done < scripts/install_config.sh
+      - name: Sync repository to Gadi
+        ### Latest at time of writing
+        uses: up9cloud/action-rsync@v1.3
+        env:
+          HOST: gadi.nci.org.au
+          TARGET: ${{secrets.GADI_REPO_PATH}}
+          KEY: ${{secrets.DEPLOY_KEY}}
+          USER: ${{secrets.GADI_USER}}
       - name: Create Admin dirs on Gadi
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: gadi.nci.org.au
           username: ${{secrets.GADI_USER}}
           key: ${{secrets.DEPLOY_KEY}}
-          envs: ADMIN_DIR,JOB_LOG_DIR,BUILD_STAGE_DIR,APPS_USER_GROUP,APPS_OWNERS_GROUP
           script: |
+            source ${{secrets.GADI_REPO_PATH}}/scripts/install_config.sh
+            source ${{secrets.GADI_REPO_PATH}}/scripts/functions.sh
             mkdir -p $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
-            chgrp -R $APPS_USERS_GROUP $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
-            chmod -R g=u+s,o= $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
-            setfacl -R -m g:$APPS_USERS_GROUP:---,g:$APPS_OWNERS_GROUP:rwX,d:g:$APPS_USERS_GROUP:---,d:g:$APPS_OWNERS_GROUP:rwX $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
-      - name: Sync repository to Gadi
-        ### Latest at time of writing
-        uses: up9cloud/action-rsync@v1.3
-        env:
-          HOST: gadi.nci.org.au
-          TARGET: $BUILD_STAGE_DIR/repo/
-          KEY: ${{secrets.DEPLOY_KEY}}
-          USER: ${{secrets.GADI_USER}}
+            set_admin_perms $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
       - name: Build environment
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: gadi.nci.org.au
           username: ${{secrets.GADI_USER}}
           key: ${{secrets.DEPLOY_KEY}}
-          envs: JOB_LOG_DIR,BUILD_STAGE_DIR
           script: |
+            export SCRIPT_DIR=${{secrets.GADI_REPO_PATH}}/scripts
+            eval $( grep JOB_LOG_DIR $SCRIPT_DIR/install_config.sh )
             cd $JOB_LOG_DIR
-            export SCRIPT_DIR="${BUILD_STAGE_DIR}"/repo/scripts
             jobid=$( qsub -N build_conda -lncpus=1,mem=20GB,walltime=2:00:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -q copyq -Wblock=true "${SCRIPT_DIR}"/build.sh )
+            job_stat=$?
+            echo "========== JOB STDOUT =========="
             cat build_conda.o"${jobid}"
+            echo "================================"
+            echo "========== JOB STDERR =========="
+            cat build_conda.e"${jobid}"
+            echo "================================"
+            exit $job_stat
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -56,9 +55,16 @@ jobs:
           host: gadi.nci.org.au
           username: ${{secrets.GADI_USER}}
           key: ${{secrets.DEPLOY_KEY}}
-          envs: JOB_LOG_DIR,BUILD_STAGE_DIR
           script: |
+            export SCRIPT_DIR=${{secrets.GADI_REPO_PATH}}/scripts
+            eval $( grep JOB_LOG_DIR $SCRIPT_DIR/install_config.sh )
             cd $JOB_LOG_DIR
-            export SCRIPT_DIR="${BUILD_STAGE_DIR}"/repo/scripts
-            jobid=$( qsub -N test_conda -lncpus=4,mem=20GB,walltime=0:30:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -Wblock=true "${SCRIPT_DIR}"/test.sh )
+            jobid=$( qsub -N test_conda -lncpus=4,mem=20GB,walltime=0:20:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -Wblock=true "${SCRIPT_DIR}"/test.sh
+            job_stat=$?
+            echo "========== JOB STDOUT =========="
             cat test_conda.o"${jobid}"
+            echo "================================"
+            echo "========== JOB STDERR =========="
+            cat test_conda.e"${jobid}"
+            echo "================================"
+            exit $job_stat
