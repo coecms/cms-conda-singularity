@@ -32,19 +32,13 @@ jobs:
           host: gadi.nci.org.au
           username: ${{secrets.GADI_USER}}
           key: ${{secrets.DEPLOY_KEY}}
+          command_timeout: 120m
           script: |
             export SCRIPT_DIR=${{secrets.GADI_REPO_PATH}}/scripts
+            eval $( grep ADMIN_DIR $SCRIPT_DIR/install_config.sh )
             eval $( grep JOB_LOG_DIR $SCRIPT_DIR/install_config.sh )
             cd $JOB_LOG_DIR
-            jobid=$( qsub -N build_conda -lncpus=1,mem=20GB,walltime=2:00:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -q copyq -Wblock=true "${SCRIPT_DIR}"/build.sh )
-            job_stat=$?
-            echo "========== JOB STDOUT =========="
-            cat build_conda.o"${jobid}"
-            echo "================================"
-            echo "========== JOB STDERR =========="
-            cat build_conda.e"${jobid}"
-            echo "================================"
-            exit $job_stat
+            qsub -N build_conda -lncpus=1,mem=20GB,walltime=2:00:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -q copyq -Wblock=true -Wumask=037 "${SCRIPT_DIR}"/build.sh
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -57,14 +51,7 @@ jobs:
           key: ${{secrets.DEPLOY_KEY}}
           script: |
             export SCRIPT_DIR=${{secrets.GADI_REPO_PATH}}/scripts
+            eval $( grep ADMIN_DIR $SCRIPT_DIR/install_config.sh )
             eval $( grep JOB_LOG_DIR $SCRIPT_DIR/install_config.sh )
             cd $JOB_LOG_DIR
-            jobid=$( qsub -N test_conda -lncpus=4,mem=20GB,walltime=0:20:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -Wblock=true "${SCRIPT_DIR}"/test.sh
-            job_stat=$?
-            echo "========== JOB STDOUT =========="
-            cat test_conda.o"${jobid}"
-            echo "================================"
-            echo "========== JOB STDERR =========="
-            cat test_conda.e"${jobid}"
-            echo "================================"
-            exit $job_stat
+            qsub -N test_conda -lncpus=4,mem=20GB,walltime=0:20:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -Wblock=true -Wumask=037 "${SCRIPT_DIR}"/test.sh

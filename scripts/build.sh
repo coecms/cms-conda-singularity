@@ -179,4 +179,6 @@ pushd "${CONDA_OUTER_BASE}"
 tar --acls -cf "${BUILD_STAGE_DIR}"/conda_base.tar "${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${MODULE_SUBDIR}" "${SCRIPT_SUBDIR}"
 popd
 
-cp deployed.yml deployed.old.yml "${BUILD_STAGE_DIR}"/
+cp deployed.yml "${BUILD_STAGE_DIR}"/
+### || true so the script doesn't report failed if its doing a fresh install.
+[[ "${DO_UPDATE}" == "--update" ]] && cp deployed.old.yml "${BUILD_STAGE_DIR}"/ || true
