@@ -25,5 +25,6 @@ jobs:
           key: ${{secrets.DEPLOY_KEY}}
           script: |
             export SCRIPT_DIR=${{secrets.GADI_REPO_PATH}}/scripts
+            eval $( grep ADMIN_DIR $SCRIPT_DIR/install_config.sh )
             eval $( grep BUILD_STAGE_DIR $SCRIPT_DIR/install_config.sh )
             "${SCRIPT_DIR}"/deploy.sh

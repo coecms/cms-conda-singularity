@@ -35,7 +35,6 @@ function set_apps_perms() {
         fi
     done
 
-    set +x
 }
 
 function set_admin_perms() {

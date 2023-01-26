@@ -14,7 +14,7 @@ export MODULE_NAME="conda_concept"
 export CONDA_SCRIPT_PATH="${CONDA_BASE}"/./"${SCRIPT_SUBDIR}"
 export CONDA_MODULE_PATH="${CONDA_BASE}"/./"${MODULE_SUBDIR}"
 export JOB_LOG_DIR="${ADMIN_DIR}"/logs
-export BUILD_STAGE_DIR=/scratch/hh5/dr4292/conda_staging/staging
+export BUILD_STAGE_DIR="${ADMIN_DIR}"/staging
 
 ### Groups
 export APPS_USERS_GROUP=hh5
