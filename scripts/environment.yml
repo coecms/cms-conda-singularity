@@ -7,7 +7,7 @@ variables:
 dependencies:
 - python>=3.9
 - pip
-- sqlalchemy
+- sqlalchemy==1.4.46 ### cosima cookbook does not import with sqlalchemy 2
 - libnetcdf>=4.7.4=mpi_openmpi* # pinned for solver stability
 - coecms-nci
 - cdo>=1.9.5 # pinned for solver stability
@@ -19,7 +19,7 @@ dependencies:
 - distributed
 - ipython
 - iris
-- netcdf4
+- netcdf4<=1.6.0 ### Workaround for https://github.com/pydata/xarray/issues/7079
 - numpy>=1.21 # Mule dependency
 - pandas
 - pygrib
