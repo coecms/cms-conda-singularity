@@ -26,8 +26,6 @@ function inner() {
     cp "${SCRIPT_DIR}"/overrides/* "${CONDA_SCRIPT_PATH}"/overrides
 
     mkdir -p "${CONDA_MODULE_PATH}"/"${MODULE_NAME}"
-    cp "${SCRIPT_DIR}"/condaenv.sh "${CONDA_MODULE_PATH}"/"${MODULE_NAME}"
-
     ### These files contain hard-coded paths to the conda installation - these paths are created with variables set by install_config.sh
     copy_and_replace "${SCRIPT_DIR}"/../modules/common_v3 "${CONDA_MODULE_PATH}"/"${MODULE_NAME}"/.common_v3 CONDA_BASE APPS_SUBDIR CONDA_INSTALL_BASENAME SCRIPT_SUBDIR
     copy_and_replace "${SCRIPT_DIR}"/../modules/are       "${CONDA_MODULE_PATH}"/"${MODULE_NAME}"/are        CONDA_BASE APPS_SUBDIR CONDA_INSTALL_BASENAME
@@ -47,7 +45,7 @@ fi
 wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
 
 mkdir -p "${OVERLAY_BASE}"
-/opt/singularity/bin/singularity -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" $( realpath $0 ) --inner
+"${SINGULARITY_BINARY_PATH}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" $( realpath $0 ) --inner
 
 ### Copy in container
 cp "${CONTAINER_PATH}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/

@@ -31,39 +31,11 @@ if {[module-info mode remove]} {
 # Name of this module's environment
 set condaenv [lindex [split [module-info name] {/}] 1]
 
-# Get the environment variables from 'conda activate'
-set app_env [exec $launcher --cms_singularity_overlay_path $overlay_path /bin/env -i $mydir/condaenv.sh $rootdir $condaenv]
-
-set lines [split $app_env '\n']
-foreach line $lines {
-    regexp {^([^=]*)=(.*)} $line -> key value
-    if {[lsearch -exact {MODULEPATH PWD _ SHLVL} $key] >= 0} {
-        continue
-    }
-    if {[string match *?PATH $key]} {
-        # A *PATH variable to be prepended with a ':'
-        prepend-path $key $value
-        continue
-    } elseif {[lsearch {_LMFILES_ LOADEDMODULES} $key] >= 0} {
-        # Modulefile stuff that works like a path
-        prepend-path $key $value
-        continue
-    } elseif {[string match PATH $key]} {
-        # PATH itself (strip out the system paths to keep ordering correct)
-        prepend-path SINGULARITYENV_PREPEND_PATH [regsub {:/usr/bin:/bin} $value {}]
-        set path_entries [ split $value ':' ]
-        ### Translate the in-container paths to their out-of-container symlink paths
-        foreach entry $path_entries {
-            if {[string match *$condaenv* $entry]} {
-                prepend-path PATH $myscripts
-            }
-        }
-        continue
-    } elseif { [string match alias?* $key] } {
-        set-alias [regsub {alias } $key {}] [ string map {\' {}} $value ]
-        continue
-    }
-    setenv $key $value
+if { [ file exists $mydir/.$condaenv ] } {
+    source $mydir/.$condaenv
+} else {
+    puts stderr "ERROR! Environment spec is missing!"
+    exit 1
 }
 
 ### Extra env to get other things working

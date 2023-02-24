@@ -132,7 +132,7 @@ fi
 
 ln -sf "${ENV_INSTALLATION_PATH}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/
 
-/opt/singularity/bin/singularity -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" $( realpath $0 ) --inner "${DO_UPDATE}"
+"${SINGULARITY_BINARY_PATH}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" $( realpath $0 ) --inner "${DO_UPDATE}"
 if [[ $? -ne 0 ]]; then
     exit 1
 fi
@@ -166,6 +166,8 @@ mksquashfs squashfs-root "${FULLENV}".sqsh -b 1M -no-recovery -noI -noD -noF -no
 cp "${FULLENV}".sqsh "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
 set_apps_perms "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
 popd
+
+construct_module_insert "${SINGULARITY_BINARY_PATH}" "${OVERLAY_BASE}" "${CONTAINER_PATH}" "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp "${SCRIPT_DIR}"/condaenv.sh "${CONDA_INSTALLATION_PATH}" "${CONDA_INSTALLATION_PATH}"/envs/"${FULLENV}" "${CONDA_SCRIPT_PATH}"/"${FULLENV}".d/bin "${CONDA_OUTER_BASE}"/"${MODULE_SUBDIR}"/"${MODULE_NAME}"/."${FULLENV}"
 
 rm "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/"${FULLENV}"
 ln -s /opt/conda/"${FULLENV}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/
