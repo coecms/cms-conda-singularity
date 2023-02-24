@@ -1,4 +1,15 @@
 ### Useful functions
+function in_array() {
+    ### Assumes first n-1 args are an array and final arg is the string to search for
+    ### Necessary because [[ libab =~ liba ]] returns true
+    declare -a allargs=( "$@" )
+    finalarg=${allargs[$(( ${#allargs[@]} - 1 ))]}
+    for (( j=0; j<$(( ${#allargs[@]} - 1 )); j++ )); do
+        [[ "${allargs[$j]}" == "${finalarg}" ]] && return 0
+    done
+    return 1
+}
+
 function get_aliased_module () {
     alias_name="${1}"
     module_path="${2}"
@@ -92,6 +103,54 @@ function symlink_atomic_update() {
     mv -T "${tmp_link_name}" "${link_name}"
 
     set_apps_perms "${link_name}"
+}
+
+function construct_module_insert() {
+
+    singularity_exec="${1}"
+    overlay_path="${2}"
+    container_path="${3}"
+    squashfs_path="${4}"
+    env_script="${5}"
+    rootdir="${6}"
+    condaenv="${7}"
+    script_path="${8}"
+    module_path="${9}"
+
+    while read line; do
+        key="${line%%=*}"
+        value="${line#*=}"
+        ### Skip these environment variables
+        in_array "MODULEPATH" "_" "PWD" "SHLVL" "${key}" && continue
+        ### Prepend to these variables
+        if [[ $key =~ .PATH$ ]]; then
+            echo prepend-path $key $value
+        ### Prepend to Modulefile variables that work like a path
+        elif in_array "_LMFILES_" "LOADEDMODULES" "${key}"; then
+            echo prepend-path $key $value
+        ### Treat path specially - remove system paths and retain order
+        elif [[ "${key}" == "PATH" ]]; then
+            while IFS= read -r -d: entry; do
+                in_array "/bin" "/usr/bin" "${entry}" && continue
+                if [[ $entry =~ $condaenv ]]; then
+                    echo prepend-path PATH $script_path
+                else
+                    echo prepend-path PATH $entry
+                fi
+                echo prepend-path SINGULARITYENV_PREPEND_PATH $entry
+            done<<<"${value%:}:"
+        elif [[ "${key}" =~ ^alias\  ]]; then
+            echo set-alias "${key//alias /}" "${value//\'/}"
+        else
+            if [[ "${value}" ]]; then
+                echo setenv $key \"$value\"
+            else
+                echo setenv $key \"\"
+            fi
+        fi
+
+    done < <( "${singularity_exec}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${overlay_path}":/g --overlay="${squashfs_path}"  "${container_path}" /bin/env -i "${env_script}" "${rootdir}" "${condaenv}" ) > "${module_path}"
+
 }
 
 function copy_and_replace() {

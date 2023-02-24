@@ -31,6 +31,7 @@ export FULLENV="${ENVIRONMENT}-${VERSION_TO_MODIFY}"
 export TEST_OUT_FILE=test_results.xml
 export PYTHONNOUSERSITE=true
 export CONTAINER_PATH=$( realpath "${SCRIPT_DIR}"/../container/base.sif )
+export SINGULARITY_BINARY_PATH="/opt/singularity/bin/singularity"
 
 declare -a rpms_to_remove=( "openssh-clients" "openssh-server" "openssh" )
 declare -a replace_from_apps=( "openmpi/4.1.4" )
