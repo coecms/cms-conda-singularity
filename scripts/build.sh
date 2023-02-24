@@ -167,7 +167,9 @@ cp "${FULLENV}".sqsh "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
 set_apps_perms "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
 popd
 
-construct_module_insert "${SINGULARITY_BINARY_PATH}" "${OVERLAY_BASE}" "${CONTAINER_PATH}" "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp "${SCRIPT_DIR}"/condaenv.sh "${CONDA_INSTALLATION_PATH}" "${CONDA_INSTALLATION_PATH}"/envs/"${FULLENV}" "${CONDA_SCRIPT_PATH}"/"${FULLENV}".d/bin "${CONDA_OUTER_BASE}"/"${MODULE_SUBDIR}"/"${MODULE_NAME}"/."${FULLENV}"
+### Can't use ${CONDA_SCRIPT_PATH} or "${CONDA_INSTALLATION_PATH}" due to the need to string match on those paths
+### which they won't with the '/./' part required for arcane rsync magic
+construct_module_insert "${SINGULARITY_BINARY_PATH}" "${OVERLAY_BASE}" "${CONTAINER_PATH}" "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp "${SCRIPT_DIR}"/condaenv.sh "${CONDA_INSTALLATION_PATH}" "${CONDA_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/"${FULLENV}" "${CONDA_BASE}"/"${SCRIPT_SUBDIR}"/"${FULLENV}".d/bin "${CONDA_OUTER_BASE}"/"${MODULE_SUBDIR}"/"${MODULE_NAME}"/."${FULLENV}"
 
 rm "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/"${FULLENV}"
 ln -s /opt/conda/"${FULLENV}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/
