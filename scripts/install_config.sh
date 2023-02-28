@@ -1,10 +1,10 @@
 ### Settings to control installation path e.g. for test installs
-export CONDA_BASE="${CONDA_BASE:-/g/data/hh5/admin/conda_concept}"
+export CONDA_BASE="${CONDA_BASE:-/g/data/hh5/public}"
 export ADMIN_DIR="${ADMIN_DIR:-/g/data/hh5/admin/conda_concept/admin}"
 export CONDA_TEMP_PATH="${PBS_JOBFS:-${CONDA_TEMP_PATH}}"
 export SCRIPT_DIR="${SCRIPT_DIR:-$PWD}"
 
-export SCRIPT_SUBDIR="apps/conda-scripts-test"
+export SCRIPT_SUBDIR="apps/cms_conda_scripts"
 export MODULE_SUBDIR="modules"
 export APPS_SUBDIR="apps"
 export CONDA_INSTALL_BASENAME="cms_conda"
@@ -22,7 +22,7 @@ export APPS_OWNERS_GROUP=hh5_w
 
 ### Version settings
 export ENVIRONMENT=analysis3
-export VERSION_TO_MODIFY=22.10
+export VERSION_TO_MODIFY=22.07
 export STABLE_VERSION=22.07
 export UNSTABLE_VERSION=22.10
 export FULLENV="${ENVIRONMENT}-${VERSION_TO_MODIFY}"
