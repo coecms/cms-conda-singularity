@@ -12,7 +12,7 @@ export MODULE_NAME="conda_concept"
 
 ### Derived locations - extra '.' for arcane rsync magic
 export CONDA_SCRIPT_PATH="${CONDA_BASE}"/./"${SCRIPT_SUBDIR}"
-export CONDA_MODULE_PATH="${CONDA_BASE}"/./"${MODULE_SUBDIR}"
+export CONDA_MODULE_PATH="${CONDA_BASE}"/./"${MODULE_SUBDIR}"/"${MODULE_NAME}"
 export JOB_LOG_DIR="${ADMIN_DIR}"/logs
 export BUILD_STAGE_DIR="${ADMIN_DIR}"/staging
 
