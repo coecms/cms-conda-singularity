@@ -74,7 +74,7 @@ dependencies:
 - nc-time-axis
 - jq
 - pvlib-python
-- parcels>=2.3.0            # Pin to force update
+- parcels<=2.4.0 ### Re-pin to force binutils update
 - siphon
 - scikit-learn
 - filelock
