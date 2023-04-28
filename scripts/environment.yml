@@ -269,5 +269,7 @@ dependencies:
 - ecgtools
 - gcc_linux-64>=12.2.0 ### Pin otherwise parcels brings in a very old version that breaks the module file
 - ipywidgets>=8
+- flox
+- erddapy>=2 ### argopy lists erddapy>=0.7 as a dependency, so 0.7.2 is deemed sufficient. This old version of erddapy cannot be imported with pandas>2
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
