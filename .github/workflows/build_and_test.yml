@@ -38,7 +38,7 @@ jobs:
             eval $( grep ADMIN_DIR $SCRIPT_DIR/install_config.sh )
             eval $( grep JOB_LOG_DIR $SCRIPT_DIR/install_config.sh )
             cd $JOB_LOG_DIR
-            qsub -N build_conda -lncpus=1,mem=20GB,walltime=2:00:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -q copyq -Wblock=true -Wumask=037 "${SCRIPT_DIR}"/build.sh
+            qsub -N build_conda -lncpus=1,mem=20GB,walltime=2:00:00,jobfs=50GB,storage=gdata/xp65 -v SCRIPT_DIR -P iq82 -q copyq -Wblock=true -Wumask=037 "${SCRIPT_DIR}"/build.sh
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -54,4 +54,4 @@ jobs:
             eval $( grep ADMIN_DIR $SCRIPT_DIR/install_config.sh )
             eval $( grep JOB_LOG_DIR $SCRIPT_DIR/install_config.sh )
             cd $JOB_LOG_DIR
-            qsub -N test_conda -lncpus=4,mem=20GB,walltime=0:20:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR -P w40 -Wblock=true -Wumask=037 "${SCRIPT_DIR}"/test.sh
+            qsub -N test_conda -lncpus=4,mem=20GB,walltime=0:20:00,jobfs=50GB,storage=gdata/xp65 -v SCRIPT_DIR -P iq82 -Wblock=true -Wumask=037 "${SCRIPT_DIR}"/test.sh
