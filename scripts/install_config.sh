@@ -18,7 +18,7 @@ export BUILD_STAGE_DIR="${ADMIN_DIR}"/staging
 
 ### Groups
 export APPS_USERS_GROUP=xp65
-export APPS_OWNERS_GROUP=xp65
+export APPS_OWNERS_GROUP=xp65_w
 
 ### Version settings
 export ENVIRONMENT=med-conda
