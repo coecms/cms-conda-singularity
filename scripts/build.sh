@@ -48,29 +48,25 @@ function inner() {
 
     pushd "${ENV_INSTALLATION_PATH}"
     ### Get rid of stuff from packages we don't want
-    for dir in bin lib etc libexec include; do
-	if [[ -d "${dir}" ]]; then
-            pushd $dir
-            for i in $( rpm -qli "${rpms_to_remove[@]}" ); do
-                fn=$( basename $i )
-                [[ -f $fn ]] && rm $fn
-                [[ -d $fn ]] && rm -rf $fn
-            done
-            popd
-	fi
+    for dir in bin lib etc libexec include; do 
+        pushd $dir
+        for i in $( rpm -qli "${rpms_to_remove[@]}" ); do 
+            fn=$( basename $i )
+            [[ -f $fn ]] && rm $fn
+            [[ -d $fn ]] && rm -rf $fn
+        done
+        popd
     done
 
     ### Replace things from apps
     for pkg in "${replace_from_apps[@]}"; do
-        for dir in bin etc lib include; do
-	    if [[ -d "${dir}" ]]; then
-                pushd $dir
-                for i in $( find /apps/$pkg/$dir -maxdepth 1 -type f ); do
-                    fn=$( basename $i )
-                    [[ -e $fn ]] && rm $fn && ln -s $i
-                done
-                popd
-	    fi
+        for dir in bin etc lib include; do 
+            pushd $dir 
+            for i in $( find /apps/$pkg/$dir -maxdepth 1 -type f ); do 
+                fn=$( basename $i ) 
+                [[ -e $fn ]] && rm $fn && ln -s $i
+            done
+            popd
         done
     done
     popd
@@ -100,7 +96,7 @@ function inner() {
     conda activate "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}"
     set -u
 
-    jupyter lab build
+#    jupyter lab build
 
     conda clean -a -f -y
 
