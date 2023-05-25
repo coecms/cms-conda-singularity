@@ -30,6 +30,14 @@ dependencies:
 - esmvaltool-python
 - esmvaltool-ncl
 - scikit-image
+- jupyter
+- jupyterlab
+- jupyterlab_server
+- jupyter_nbextensions_configurator
+- jupyter_contrib_nbextensions
+- jupyter-server-proxy
+- jupyter-book
+- jupyter-resource-usage
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
 
