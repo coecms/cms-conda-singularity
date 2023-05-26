@@ -38,6 +38,9 @@ dependencies:
 - jupyter-server-proxy
 - jupyter-book
 - jupyter-resource-usage
+- greenlet ### Dependency of... something?
+- objgraph ### Unlisted dependency of greenlet
+- asyncssh
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
 
