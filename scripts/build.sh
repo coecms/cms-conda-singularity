@@ -96,7 +96,7 @@ function inner() {
     conda activate "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}"
     set -u
 
-#    jupyter lab build
+    #jupyter lab build
 
     conda clean -a -f -y
 

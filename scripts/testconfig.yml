@@ -42,6 +42,7 @@ skip:
 - nctoolkit # calls plotnine
 - xgboost.spark ### Don't think we support spark as a parallel backend
 - skimage.future.graph ### Deprecated
+- send2trash
 
 # Preload these modules before testing to avoid weird python issues
 preload:
@@ -51,3 +52,4 @@ preload:
 # can remove
 exception:
 - matplotlib.tests
+- zmq.backend.cffi
