@@ -20,9 +20,10 @@ skip:
 - httpx
 - sanic
 - tests # random tests from black?
-- cupy # Disable when testing locally
-- cupyx # ditto
-- nci_intake_catalogue # ditto
+ # - cupy # Disable when testing locally
+ # - cupyx # ditto
+ # - nci_intake_catalogue # ditto
+ # - wrf # Prints garbage at v1.3.2.5
 - matplotlib.tests # No test data
 - prometheus_client.twisted # No twisted
 - pyface
@@ -38,9 +39,11 @@ skip:
 # for both hdbscan and cosima_cookbook see https://accessdev.nci.org.au/jenkins/job/conda/job/analysis3-unstable/1351/consoleFull
 - hdbscan # test errors but can import
 - cosima_cookbook  # test error 
-- plotnine # can't import fails on "import matplotlib._contour as _contour" which seems to work otherwise
-- nctoolkit # calls plotnine
+  #- plotnine # can't import fails on "import matplotlib._contour as _contour" which seems to work otherwise
+  #- nctoolkit # calls plotnine
 - xgboost.spark ### Don't think we support spark as a parallel backend
+- send2trash.mac ### Gadi is not a mac
+- send2trash.win ### Nor is it windows
 
 # Preload these modules before testing to avoid weird python issues
 preload:
