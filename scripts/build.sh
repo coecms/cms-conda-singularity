@@ -123,6 +123,13 @@ else
     ./initialise.sh
 fi
 
+### Copy in any files outside the conda directory tree that may be needed
+echo "Copying external files"
+for f in "${outside_files_to_copy[@]}"; do
+    mkdir -p "${OVERLAY_BASE}"/$( dirname "${f#/g/}" )
+    cp "${f}" "${OVERLAY_BASE}"/"${f#/g/}"
+done
+
 if [[ -e  "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}.sqsh" ]]; then
     pushd "${CONDA_TEMP_PATH}"
     unsquashfs -processors 1 "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}.sqsh"
