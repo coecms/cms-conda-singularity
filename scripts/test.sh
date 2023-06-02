@@ -51,6 +51,13 @@ pushd "${CONDA_OUTER_BASE}"
 tar -xf "${BUILD_STAGE_DIR}"/conda_base.tar
 popd
 
+### Copy in any files outside the conda directory tree that may be needed
+echo "Copying external files"
+for f in "${outside_files_to_copy[@]}"; do
+    mkdir -p "${OVERLAY_BASE}"/$( dirname "${f#/g/}" )
+    cp "${f}" "${OVERLAY_BASE}"/"${f#/g/}"
+done
+
 "${SINGULARITY_BINARY_PATH}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g --overlay="${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp "${CONTAINER_PATH}" $( realpath $0 ) --inner
 
 if [[ ! -e "${TEST_OUT_FILE}" ]]; then
