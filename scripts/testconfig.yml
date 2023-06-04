@@ -44,6 +44,7 @@ skip:
 - skimage.future.graph ### Deprecated
 - send2trash
 - esmf_regrid
+- esmvaltool.diag_scripts
 
 # Preload these modules before testing to avoid weird python issues
 preload:
