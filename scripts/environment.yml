@@ -43,6 +43,7 @@ dependencies:
 - objgraph ### Unlisted dependency of greenlet
 - asyncssh
 - gevent
+- julia
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
 
