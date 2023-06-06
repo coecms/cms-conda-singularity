@@ -27,7 +27,7 @@ dependencies:
 - scipy
 - h5py
 - numba
-- esmvaltool
+- esmvaltool==2.8 # Pin esmvaltool version to 2.8
 - esmvaltool-python
 - esmvaltool-ncl
 - scikit-image
