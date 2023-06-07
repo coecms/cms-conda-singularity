@@ -18,6 +18,7 @@ dependencies:
 - jinja2
 - ilamb
 - dask
+- dask-labextension
 - hvplot
 - datashader
 - iris
