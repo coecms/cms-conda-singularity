@@ -1,6 +1,7 @@
 # Modules test will not try to import
 skip:
 # Cause errors and don't throw exceptions cleanly
+- access_nri_intake
 - psutil.tests
 - pandas.io.clipboard
 - matplotlib.backends
