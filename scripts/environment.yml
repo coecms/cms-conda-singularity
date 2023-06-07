@@ -19,6 +19,7 @@ dependencies:
 - ilamb
 - dask
 - dask-labextension
+- panel
 - hvplot
 - datashader
 - iris
