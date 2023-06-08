@@ -37,7 +37,7 @@ dependencies:
 - esmvaltool-ncl
 - scikit-image
 - jupyter
-- jupyterlab
+- jupyterlab=3.6.4
 - jupyterlab_server
 - jupyter_nbextensions_configurator
 - jupyter_contrib_nbextensions
