@@ -18,6 +18,7 @@ dependencies:
 - jinja2
 - ilamb
 - dask
+- dask-labextension
 - panel
 - hvplot
 - datashader
@@ -25,6 +26,7 @@ dependencies:
 - intake
 - access-nri-intake
 - netcdf4<=1.6.0 ### Workaround for https://github.com/pydata/xarray/issues/7079
+- nodejs
 - numpy>=1.21 # Mule dependency
 - pandas
 - scipy
