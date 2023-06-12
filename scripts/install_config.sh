@@ -23,8 +23,8 @@ export APPS_OWNERS_GROUP=hh5_w
 ### Version settings
 export ENVIRONMENT=analysis3
 export VERSION_TO_MODIFY=23.04
-export STABLE_VERSION=22.10
-export UNSTABLE_VERSION=23.01
+export STABLE_VERSION=23.01
+export UNSTABLE_VERSION=23.04
 export FULLENV="${ENVIRONMENT}-${VERSION_TO_MODIFY}"
 
 ### Other settings
