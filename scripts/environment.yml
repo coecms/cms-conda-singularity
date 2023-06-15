@@ -24,7 +24,7 @@ dependencies:
 - datashader
 - iris
 - intake
-- access-nri-intake
+- access-nri-intake==0.0.7 # Keep pinned to latest version while in development
 - netcdf4<=1.6.0 ### Workaround for https://github.com/pydata/xarray/issues/7079
 - nodejs
 - numpy>=1.21 # Mule dependency
