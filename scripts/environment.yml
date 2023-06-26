@@ -5,6 +5,7 @@ channels:
 variables:
   CARTOPY_USER_BACKGROUNDS: /g/data/xp65/public/apps/cartopy-data/backgrounds
 dependencies:
+- apscheduler
 - fs
 - python>=3.9
 - pip
