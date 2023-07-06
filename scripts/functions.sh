@@ -83,10 +83,9 @@ function write_modulerc() {
     cat<<EOF > "${module_path}"/.modulerc
 #%Module1.0
 
-module-version ${module_name}/${stable} analysis ${env_name} default
+module-version ${module_name}/${stable} access-med ${env_name} default
 module-version ${module_name}/${unstable} ${env_name}-unstable
 
-module-version ${module_name}/analysis27-18.10 analysis27
 EOF
 
     set_apps_perms "${module_path}/.modulerc"
