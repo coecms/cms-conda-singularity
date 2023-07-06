@@ -1,8 +1,8 @@
-# CMS Containerised Conda
+# ACCESS-MED Containerised Conda Environment
 
 ## Overview
 
-The CMS Containerised Conda environment is an approach to deploying and maintaining large conda environmnents while reducing inode usage and increasing performance. It takes advantage of `singularity`'s ability to manage overlay and `squashfs` filesystems. Each conda environment is consolidated into its own squashfs file, and then one or more of these squashfs environments is loaded using components of the environment.
+The ACCESS-MED Containerised Conda environment is an approach to deploying and maintaining large conda environmnents while reducing inode usage and increasing performance. It takes advantage of `singularity`'s ability to manage overlay and `squashfs` filesystems. Each conda environment is consolidated into its own squashfs file, and then one or more of these squashfs environments is loaded using components of the environment.
 
 This documentation deals with the installation of the CMS Containerised Conda environments, for more details on usage and the motivation behind this set up, see the [Conda hh5 environment setup page on the CMS Wiki](https://climate-cms.org/cms-wiki/resources/resources-conda-setup.html). If you're experiencing an issue with the environment installed on Gadi, please submit an issue [here](https://github.com/coecms/cms-conda-singularity/issues) or email cws_help@nci.org.au.
 
