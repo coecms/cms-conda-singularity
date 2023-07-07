@@ -52,7 +52,7 @@ dependencies:
 - gevent
 - julia
 - esmf
-- ESMF
+- xESMF
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
 
