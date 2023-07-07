@@ -34,7 +34,7 @@ dependencies:
 - scipy
 - h5py
 - numba
-- esmvaltool==2.8 # Pin esmvaltool version to 2.9
+- esmvaltool>=2.8,<2.9 # Pin esmvaltool version to 2.8
 - esmvaltool-python
 - esmvaltool-ncl
 - scikit-image
@@ -51,6 +51,15 @@ dependencies:
 - asyncssh
 - gevent
 - julia
+- openmpi
+- mpi4py
+- esmf
+- esmpy
+- xesmf
+- xarray
+- shapely
+- cf_xarray
+- sparse
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
 

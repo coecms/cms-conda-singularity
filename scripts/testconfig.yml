@@ -8,6 +8,7 @@ skip:
 - pbr.tests
 - plotly.plotly
 - bokeh.server.django
+- xesmf
 # Too many, or not necessary
 - iris.tests
 - cartopy.tests
