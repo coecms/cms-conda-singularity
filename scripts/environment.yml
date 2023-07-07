@@ -52,6 +52,7 @@ dependencies:
 - gevent
 - julia
 - esmpy
+- xesmf
 - xarray
 - shapely
 - cf_xarray
