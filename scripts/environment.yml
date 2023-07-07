@@ -16,6 +16,7 @@ dependencies:
 - cdo>=1.9.5 # pinned for solver stability
 # pinning matplotlib to 3.5.3 temporarily until plotnine issue is fixed https://github.com/has2k1/plotnine/issues/620
 - matplotlib==3.5.3  #
+- pydantic<2.0 # Until https://github.com/intake/intake-esm/pull/619 is fixed
 - jinja2
 - ilamb
 - dask
@@ -50,7 +51,6 @@ dependencies:
 - asyncssh
 - gevent
 - julia
-- pydantic<2.0 # Until https://github.com/intake/intake-esm/pull/619 is fixed
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
 
