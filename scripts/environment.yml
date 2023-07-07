@@ -53,9 +53,9 @@ dependencies:
 - julia
 - openmpi
 - mpi4py
-- esmf>=8.0.1=mpi_openmpi*
-- esmpy>=8.0.1=mpi_openmpi*
-- xesmf>=0.6.2 # https://github.com/pangeo-data/xESMF/issues/127
+- esmf
+- esmpy
+- xesmf
 - xarray
 - shapely
 - cf_xarray
