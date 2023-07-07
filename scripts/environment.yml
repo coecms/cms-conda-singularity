@@ -51,8 +51,11 @@ dependencies:
 - asyncssh
 - gevent
 - julia
-- esmf
-- xESMF
+- esmpy
+- xarray
+- shapely
+- cf_xarray
+- sparse
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
 
