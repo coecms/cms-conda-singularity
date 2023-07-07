@@ -41,9 +41,9 @@ set -e
 mv "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp "${CONDA_INSTALLATION_PATH}"/envs/"${FULLENV}".sqsh
 
 ### Update stable/unstable if necessary
-CURRENT_STABLE=$( get_aliased_module "${MODULE_NAME}"/analysis "${CONDA_MODULE_PATH}" )
+CURRENT_STABLE=$( get_aliased_module "${MODULE_NAME}"/access-med "${CONDA_MODULE_PATH}" )
 NEXT_STABLE="${ENVIRONMENT}-${STABLE_VERSION}"
-CURRENT_UNSTABLE=$( get_aliased_module "${MODULE_NAME}"/analysis3-unstable "${CONDA_MODULE_PATH}" )
+CURRENT_UNSTABLE=$( get_aliased_module "${MODULE_NAME}"/access-med-unstable "${CONDA_MODULE_PATH}" )
 NEXT_UNSTABLE="${ENVIRONMENT}-${UNSTABLE_VERSION}"
 
 if ! [[ "${CURRENT_STABLE}" == "${MODULE_NAME}/${NEXT_STABLE}" ]]; then

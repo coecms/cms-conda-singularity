@@ -6,9 +6,9 @@ inhibit-self-conflict
 inhibit-base-envvar
 inhibit-version-envvar
 
-### Loads the conda/analysis3 module, but brings all squashfs into the container
+### Loads the conda/access-med module, but brings all squashfs into the container
 module load singularity
-module load conda/analysis3
+module load conda/access-med
 
 foreach sqshfs [ glob $::basedir/*sqsh ] {
     prepend-path CONTAINER_OVERLAY_PATH $sqshfs

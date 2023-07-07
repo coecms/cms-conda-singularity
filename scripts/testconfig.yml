@@ -8,6 +8,8 @@ skip:
 - pbr.tests
 - plotly.plotly
 - bokeh.server.django
+- ecgtools
+- intake_esm
 # Too many, or not necessary
 - iris.tests
 - cartopy.tests
