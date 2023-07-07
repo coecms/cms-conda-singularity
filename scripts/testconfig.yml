@@ -8,6 +8,7 @@ skip:
 - pbr.tests
 - plotly.plotly
 - bokeh.server.django
+- ecgtools
 # Too many, or not necessary
 - iris.tests
 - cartopy.tests
@@ -56,4 +57,3 @@ preload:
 exception:
 - matplotlib.tests
 - zmq.backend.cffi
-- pydantic.deprecated
