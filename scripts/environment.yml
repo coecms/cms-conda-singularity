@@ -8,7 +8,7 @@ dependencies:
 - apscheduler
 - fs
 - python>=3.9
-- pip
+- pip!=21.3
 - pytest
 - pytest-cov
 - autopep8
@@ -35,7 +35,7 @@ dependencies:
 - scipy
 - h5py
 - numba
-- esmvaltool>=2.8,<2.9 # Pin esmvaltool version to 2.8
+- esmvaltool 2.8.*
 - esmvaltool-python
 - esmvaltool-ncl
 - scikit-image
