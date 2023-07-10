@@ -9,7 +9,7 @@ dependencies:
 - fs
 - python>=3.9
 - pip!=21.3
-- pytest
+- pytest >=3.9,!=6.0.0rc1,!=6.0.0
 - pytest-cov
 - autopep8
 - pyyaml
@@ -30,12 +30,12 @@ dependencies:
 - access-nri-intake==0.0.8 # Keep pinned to latest version while in development
 - netcdf4<=1.6.0 ### Workaround for https://github.com/pydata/xarray/issues/7079
 - nodejs
-- numpy>=1.21 # Mule dependency
+- numpy>=1.21, !=1.24.3  # severe masking bug
 - pandas
 - scipy
 - h5py
 - numba
-- esmvaltool 2.8.*
+- esmvaltool 2.9.*
 - esmvaltool-python
 - esmvaltool-ncl
 - scikit-image
@@ -51,16 +51,18 @@ dependencies:
 - objgraph ### Unlisted dependency of greenlet
 - asyncssh
 - gevent
-- julia
 - openmpi
 - mpi4py
 - esmf
 - esmpy
-- xesmf==0.3.0
-- xarray
+- xesmf >=0.7.1
+- xarray >=0.12.0
 - shapely
 - cf_xarray
 - sparse
+- xgboost >1.6.1  # github.com/ESMValGroup/ESMValTool/issues/2779
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
-
+  
+# Julia (dependencies installed by separate script)
+- julia
