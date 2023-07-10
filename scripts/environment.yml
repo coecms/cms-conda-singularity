@@ -24,7 +24,8 @@ dependencies:
 - panel
 - hvplot
 - datashader
-- iris
+- iris>=3.1.0
+- iris-esmf-regrid
 - intake
 - access-nri-intake==0.0.8 # Keep pinned to latest version while in development
 - netcdf4<=1.6.0 ### Workaround for https://github.com/pydata/xarray/issues/7079
@@ -55,7 +56,7 @@ dependencies:
 - mpi4py
 - esmf
 - esmpy
-- xesmf
+- xesmf==0.3.0
 - xarray
 - shapely
 - cf_xarray
