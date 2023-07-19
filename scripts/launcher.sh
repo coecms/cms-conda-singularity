@@ -20,6 +20,11 @@ source "${conf_file}"
 declare -a PROG_ARGS=()
 while [[ $# -gt 0 ]]; do
     case "${1}" in 
+        "--cms_singularity_overlay_path_override")
+            ### Sometimes we do not want to use the 'correct' container
+            export CONTAINER_OVERLAY_PATH_OVERRIDE=1
+            shift
+            ;;
         "--cms_singularity_overlay_path")
             ### From time to time we need to manually specify an overlay filesystem, handle that here:
             export CONTAINER_OVERLAY_PATH="${2}"
@@ -65,9 +70,15 @@ fi
 ### Handle the case where we've been invoked directly. Make sure the container
 ### we need is on path, and that CONDA_BASE is set so that the right thing
 ### runs in the container. If we haven't been directly invoked, this does
-### nothing
+### nothing - Unless told otherwise
+###
+### Reminder: The --overlay argument that appears LAST takes priority, so put the
+### default container first, that way if we're intentionally trying to use it from
+### somewhere else (e.g. jobfs), the one on gdata will be mounted but not used.
 myenv=$( basename "${wrapper_bin%/*}" ".d" )
-[[ :"${CONTAINER_OVERLAY_PATH}": =~ :"${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh: ]] || export CONTAINER_OVERLAY_PATH="${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh:${CONTAINER_OVERLAY_PATH}
+if ! [[ "${CONTAINER_OVERLAY_PATH_OVERRIDE}" ]]; then
+    [[ :"${CONTAINER_OVERLAY_PATH}": =~ :"${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh: ]] || export CONTAINER_OVERLAY_PATH="${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh:${CONTAINER_OVERLAY_PATH}
+fi
 export CONDA_BASE="${CONDA_BASE_ENV_PATH}/envs/${myenv}"
 
 if ! [[ -x "${SINGULARITY_BINARY_PATH}" ]]; then
