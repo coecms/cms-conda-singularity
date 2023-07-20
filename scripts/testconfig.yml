@@ -51,6 +51,7 @@ skip:
 # Preload these modules before testing to avoid weird python issues
 preload:
 - xarray
+- setuptools.command.build_ext ### Strange issue with numba.pycc
 
 # Allow loading, but pass exceptions. When exceptions no longer triggered
 # can remove
