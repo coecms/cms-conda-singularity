@@ -43,16 +43,14 @@ dependencies:
 - esmvaltool-ncl
 - scikit-image
 - jupyter
-- notebook
-#- jupyter_nbextensions_configurator
-#- jupyter_contrib_nbextensions
+- notebook<6.5.3
+- jupyter_nbextensions_configurator
+- jupyter_contrib_nbextensions
 - jupyterlab
 - jsonschema>=4.18.1
 - jupyterlab_server
 - jupyter-server-proxy
 - jupyter-resource-usage
-- jupyter-book
-- jupytext
 - greenlet ### Dependency of... something?
 - objgraph ### Unlisted dependency of greenlet
 - asyncssh
