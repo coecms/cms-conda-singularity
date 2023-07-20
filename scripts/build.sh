@@ -97,9 +97,9 @@ function inner() {
     set -u
 
     jupyter lab build
-    esmvaltool install Julia
-
+    # esmvaltool install Julia
     conda clean -a -f -y
+    conda list
 
 }
 
