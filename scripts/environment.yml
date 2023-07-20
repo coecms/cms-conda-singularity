@@ -59,6 +59,7 @@ dependencies:
 - mpi4py
 - esmf>=8.0.1=mpi_openmpi*
 - esmpy>=8.0.1=mpi_openmpi*
+- pytest-json-report ### Needed for esmpy
 - xesmf >=0.7.1
 - xarray >=0.12.0
 - shapely
