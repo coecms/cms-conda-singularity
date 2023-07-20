@@ -51,6 +51,8 @@ dependencies:
 - jupyterlab_server
 - jupyter-server-proxy
 - jupyter-resource-usage
+- jupyter-book
+- jupytext
 - greenlet ### Dependency of... something?
 - objgraph ### Unlisted dependency of greenlet
 - asyncssh
