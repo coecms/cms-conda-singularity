@@ -19,6 +19,7 @@ dependencies:
 - jinja2
 - ilamb 2.7.*
 - dask
+- distributed
 - dask-labextension
 - panel
 - hvplot
@@ -32,6 +33,7 @@ dependencies:
 - netcdf4<=1.6.0 ### Workaround for https://github.com/pydata/xarray/issues/7079
 - pydantic<2.0 # Can remove with access-nri-intake==0.0.9
 - nodejs
+- notebook
 - numpy>=1.21, !=1.24.3  # severe masking bug
 - pandas
 - scipy
