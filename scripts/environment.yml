@@ -30,7 +30,7 @@ dependencies:
 - seaborn
 - xarray
 - jupyter
-- notebook
+- notebook<7 ### Pin for now as jupyter_contrib_nbextensions not compatible with notebook 7
 - nb_conda
 - metpy
 - windspharm
