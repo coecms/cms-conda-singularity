@@ -65,9 +65,12 @@ function inner() {
         for dir in bin etc lib include; do
 	    if [[ -d "${dir}" ]]; then
                 pushd $dir
-                for i in $( find /apps/$pkg/$dir -maxdepth 1 -type f ); do
-                    fn=$( basename $i )
-                    [[ -e $fn ]] && rm $fn && ln -s $i
+                apps_subdir=/apps/"${pkg}"/"${dir}"
+                for i in $( find "${apps_subdir}" -type f ); do
+                    fn="${i//$apps_subdir\//}"
+                    [[ -e $fn ]] && rm $fn
+                    [[ "${fn}" != "${fn%/*}" ]] && mkdir -p "${fn%/*}"
+                    ln -s "${i}" "${fn}"
                 done
                 popd
 	    fi
