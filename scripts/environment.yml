@@ -30,7 +30,7 @@ dependencies:
 - seaborn
 - xarray
 - jupyter
-- notebook<7 ### Pin for now as jupyter_contrib_nbextensions not compatible with notebook 7
+- notebook<7 ### Roll-back due to some incompatible extensions
 - nb_conda
 - metpy
 - windspharm
@@ -121,7 +121,7 @@ dependencies:
 - coecms-util
 - yamanifest
 - cmocean
-- accessnri::payu
+- accessnri::payu==1.0.27
 - splitvar
 - marineHeatWaves
 - holoviews
