@@ -183,7 +183,7 @@ pushd "${CONDA_TEMP_PATH}"
 ### Don't need to think too hard, squashfs are read-only
 chgrp -R "${APPS_USERS_GROUP}" squashfs-root
 
-mksquashfs squashfs-root "${FULLENV}".sqsh -b 1M -no-recovery -noI -noD -noF -noX -processors 8 2>/dev/null
+mksquashfs squashfs-root "${FULLENV}".sqsh -no-fragments -no-duplicates -no-sparse -no-exports -no-recovery -noI -noD -noF -noX -processors 8 2>/dev/null
 ### Stage this file and rename when we're ready
 cp "${FULLENV}".sqsh "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
 set_apps_perms "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
