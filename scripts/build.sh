@@ -154,7 +154,14 @@ fi
 
 ln -sf "${ENV_INSTALLATION_PATH}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/
 
-"${SINGULARITY_BINARY_PATH}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" $( realpath $0 ) --inner "${DO_UPDATE}"
+if [[ -e "${CONTAINER_PATH}" ]]; then
+    ### New container, use that
+    my_container="${CONTAINER_PATH}"
+else
+    my_container="${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}"
+fi
+
+"${SINGULARITY_BINARY_PATH}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${my_container}" $( realpath $0 ) --inner "${DO_UPDATE}"
 if [[ $? -ne 0 ]]; then
     exit 1
 fi

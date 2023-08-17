@@ -18,7 +18,7 @@ jobs:
             containerdef:
               - container/container.def
       - name: Build container if definition has changed
-        if: steps.changed-container-def.outputs.test_any_changed == 'true'
+        if: steps.changed-container-def.outputs.containerdef_any_changed == 'true'
         run: |
           pushd container
           sudo -E singularity build base.sif container.def
