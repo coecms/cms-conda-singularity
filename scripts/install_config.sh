@@ -30,7 +30,7 @@ export FULLENV="${ENVIRONMENT}-${VERSION_TO_MODIFY}"
 ### Other settings
 export TEST_OUT_FILE=test_results.xml
 export PYTHONNOUSERSITE=true
-export CONTAINER_PATH=$( realpath "${SCRIPT_DIR}"/../container/base.sif )
+export CONTAINER_PATH="${SCRIPT_DIR}"/../container/base.sif
 export SINGULARITY_BINARY_PATH="/opt/singularity/bin/singularity"
 
 declare -a rpms_to_remove=( "openssh-clients" "openssh-server" "openssh" )
