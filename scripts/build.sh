@@ -160,9 +160,10 @@ if [[ $? -ne 0 ]]; then
 fi
 
 ### See if the container has been updated
-read newhash fn < <( md5sum "${CONTAINER_PATH}" )
-read oldhash fn < <( md5sum "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}" )
-if [[ "${oldhash}" != "${newhash}" ]]; then
+### The container will only exist on ${CONTAINER_PATH} if it was built by the github action
+#read newhash fn < <( md5sum "${CONTAINER_PATH}" )
+#read oldhash fn < <( md5sum "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}" )
+if [[ -e "${CONTAINER_PATH}" ]]; then
     echo "Container update detected. Copying in new container"
     cp "${CONTAINER_PATH}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}"
 fi
