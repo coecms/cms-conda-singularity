@@ -20,9 +20,7 @@ jobs:
       - name: Build container if definition has changed
         if: steps.changed-container-def.outputs.containerdef_any_changed == 'true'
         run: |
-          pushd container
-          sudo -E singularity build base.sif container.def
-          popd
+          sudo -E singularity build container/base.sif container/container.def
       - name: Sync repository to Gadi
         ### Latest at time of writing
         uses: up9cloud/action-rsync@v1.3
