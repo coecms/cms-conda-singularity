@@ -68,7 +68,7 @@ dependencies:
 - xgboost >1.6.1  # github.com/ESMValGroup/ESMValTool/issues/2779
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
-  - access-med-utils==0.1.4
+  - access-med-utils==0.1.5
   
 # Julia (dependencies installed by separate script)
 - julia
