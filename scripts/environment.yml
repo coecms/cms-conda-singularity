@@ -277,5 +277,6 @@ dependencies:
 - shellcheck
 - pysteps
 - ucx-py
+- geocat-viz
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
