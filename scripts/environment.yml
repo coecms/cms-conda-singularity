@@ -65,6 +65,7 @@ dependencies:
 - shapely
 - cf_xarray
 - sparse
+- ucx-py
 - xgboost >1.6.1  # github.com/ESMValGroup/ESMValTool/issues/2779
 - med-diagnostics==0.0.1 # pining for now
 - pip:
