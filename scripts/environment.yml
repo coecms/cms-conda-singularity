@@ -68,7 +68,7 @@ dependencies:
 - matplotlib
 #- matplotlib>=3.5.2|<=3.4.3  # pinned to solve  https://github.com/matplotlib/matplotlib/issues/21917
 - dreqpy
-- pint
+- pint<0.20 ### Pint 0.22 breaks geocat
 - pycodestyle 
 - nc-time-axis
 - jq
