@@ -28,7 +28,7 @@ dependencies:
 - pytest
 - scipy
 - seaborn
-- xarray
+- xarray>2023.9 ### py-cordex fixes xarray at != 2023.9.0 - set this to prevent downgrade
 - jupyter
 - notebook
 - metpy
@@ -128,7 +128,7 @@ dependencies:
 - xrft
 - git
 - openmpi
-- mpi4py
+- mpi4py==3.1.4 ### Prevent installation of Intel MPI
 - palettable
 - xlrd
 - nccompress
@@ -279,5 +279,6 @@ dependencies:
 - ucx-py
 - geocat-viz
 - icclim>=6.4.0 ### Prevent downgrade
+- py-cordex
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
