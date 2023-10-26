@@ -280,5 +280,6 @@ dependencies:
 - geocat-viz
 - icclim>=6.4.0 ### Prevent downgrade
 - py-cordex
+- pdbufr
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
