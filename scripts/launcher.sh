@@ -119,4 +119,10 @@ while IFS= read -r -d: i; do
     overlay_args="${overlay_args}--overlay=${i} "
 done<<<"${CONTAINER_OVERLAY_PATH%:}:"
 
-"$SINGULARITY_BINARY_PATH" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/sys/fs/cgroup ${overlay_args} "${CONTAINER_PATH}" "${cmd_to_run[@]}"
+bind_str=""
+for bind_dir in "${bind_dirs[@]}"; do
+    [[ -d "${bind_dir}" ]] && bind_str="${bind_str}${bind_dir},"
+done
+bind_str=${bind_str%,}
+
+"$SINGULARITY_BINARY_PATH" -s exec --bind "${bind_str}" "${overlay_args}" "${CONTAINER_PATH}" "${cmd_to_run[@]}"

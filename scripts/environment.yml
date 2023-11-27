@@ -281,5 +281,6 @@ dependencies:
 - icclim>=6.4.0 ### Prevent downgrade
 - py-cordex
 - pdbufr
+- matplotlib-scalebar
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
