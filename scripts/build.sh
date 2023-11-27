@@ -4,8 +4,6 @@ set -eu
 [[ "${SCRIPT_DIR}" ]] && cd "${SCRIPT_DIR}"
 
 source install_config.sh
-### WARNING: unconfigured conf file - only use $bind_dirs
-source launcher_conf.sh
 source functions.sh
 
 ### Derived temp file locations
