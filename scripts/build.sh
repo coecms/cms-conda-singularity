@@ -4,6 +4,8 @@ set -eu
 [[ "${SCRIPT_DIR}" ]] && cd "${SCRIPT_DIR}"
 
 source install_config.sh
+### WARNING: unconfigured conf file - only use $bind_dirs
+source launcher_conf.sh
 source functions.sh
 
 ### Derived temp file locations
@@ -161,7 +163,13 @@ else
     my_container="${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}"
 fi
 
-"${SINGULARITY_BINARY_PATH}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${my_container}" $( realpath $0 ) --inner "${DO_UPDATE}"
+bind_str=""
+for bind_dir in "${bind_dirs[@]}"; do
+    [[ -d "${bind_dir}" ]] && bind_str="${bind_str}${bind_dir},"
+done
+bind_str="${bind_str}${OVERLAY_BASE}":/g
+
+"${SINGULARITY_BINARY_PATH}" -s exec --bind "${bind_str}" "${my_container}" $( realpath $0 ) --inner "${DO_UPDATE}"
 if [[ $? -ne 0 ]]; then
     exit 1
 fi
