@@ -32,6 +32,7 @@ Bootstrap: scratch
         mkdir -p ${SINGULARITY_ROOTFS}/system
         mkdir -p ${SINGULARITY_ROOTFS}/usr
         mkdir -p ${SINGULARITY_ROOTFS}/sys/fs/cgroup
+        mkdir -p ${SINGULARITY_ROOTFS}/iointensive
 
         ### Mount points for service sockets
         mkdir -p ${SINGULARITY_ROOTFS}/var/lib/sss
@@ -42,6 +43,7 @@ Bootstrap: scratch
         mkdir -p ${SINGULARITY_ROOTFS}/opt/conda/analysis3-23.01
         mkdir -p ${SINGULARITY_ROOTFS}/opt/conda/analysis3-23.04
         mkdir -p ${SINGULARITY_ROOTFS}/opt/conda/analysis3-23.07
+        mkdir -p ${SINGULARITY_ROOTFS}/opt/conda/analysis3-23.10
 
 %runscript
         /usr/bin/bash -l
