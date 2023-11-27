@@ -38,4 +38,4 @@ declare -a replace_from_apps=( "openmpi/4.1.5" "ucx/1.14.0" )
 declare -a outside_commands_to_include=( "pbs_tmrsh" "ssh" )
 declare -a outside_files_to_copy=( "/g/data/hh5/public/apps/nci-intake-catalogue/catalogue_new.yaml" )
 
-declare -a bind_dirs=( "/etc" "/half-root" "/local" "/ram" "/run" "/system" "/usr" "/var/lib/sss" "/var/run/munge" "/sys/fs/cgroup" "/iointensive" )
+declare -a bind_dirs=( "/etc" "/half-root" "/local" "/ram" "/run" "/system" "/usr" "/var/lib/sss" "/var/lib/rpm" "/var/run/munge" "/sys/fs/cgroup" "/iointensive" )
