@@ -125,4 +125,4 @@ for bind_dir in "${bind_dirs[@]}"; do
 done
 bind_str=${bind_str%,}
 
-"$SINGULARITY_BINARY_PATH" -s exec --bind "${bind_str}" "${overlay_args}" "${CONTAINER_PATH}" "${cmd_to_run[@]}"
+"$SINGULARITY_BINARY_PATH" -s exec --bind "${bind_str}" ${overlay_args} "${CONTAINER_PATH}" "${cmd_to_run[@]}"
