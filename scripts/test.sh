@@ -14,11 +14,10 @@ export CONDA_OUTER_BASE="${OVERLAY_BASE}"/"${CONDA_BASE#/*/}"
 export CONDA_INSTALLATION_PATH=${CONDA_INSTALLATION_PATH:-${CONDA_BASE}/./${APPS_SUBDIR}/${CONDA_INSTALL_BASENAME}}
 
 function inner() {
-
-    source "${CONDA_INSTALLATION_PATH}"/etc/profile.d/conda.sh
     
     set +u
-    conda activate "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}"
+    eval "$( "${CONDA_INSTALLATION_PATH}"/bin/micromamba shell hook --shell bash)"
+    micromamba activate "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}"
     set -u
 
     ### For reasons I can't figure out, py.test hangs on exit due to not being able to
