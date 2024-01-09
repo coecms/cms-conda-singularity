@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3.3.0
       - name: Check if container definition has changed
         id: changed-container-def
-        uses: tj-actions/changed-files@v37
+        uses: tj-actions/changed-files@v41
         with:
           files_yaml: |
             containerdef:
