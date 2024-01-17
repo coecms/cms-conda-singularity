@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+if [[ ! "${CONDA_ENVIRONMENT}" ]]; then
+    echo "Error! CONDA_ENVIRONMENT must be defined"
+    exit 1
+fi
+
 set -eu
 
 [[ "${SCRIPT_DIR}" ]] && cd "${SCRIPT_DIR}"
@@ -13,14 +18,23 @@ export ENV_INSTALLATION_PATH="${CONDA_TEMP_PATH}"/squashfs-root/opt/conda/"${FUL
 
 ### Derived installation paths
 export CONDA_INSTALLATION_PATH=${CONDA_INSTALLATION_PATH:-${CONDA_BASE}/./${APPS_SUBDIR}/${CONDA_INSTALL_BASENAME}}
-export MAMBA="${CONDA_INSTALLATION_PATH}"/condabin/mamba
+export MAMBA="${CONDA_INSTALLATION_PATH}"/bin/micromamba
+export MAMBA_ROOT_PREFIX="${CONDA_INSTALLATION_PATH}"
+
+export ENV_FILE="${SCRIPT_DIR}"/../environments/"${CONDA_ENVIRONMENT}"/environment.yml
+if ! [[ -e "${ENV_FILE}" ]]; then
+    echo "Error! Environment file for ${CONDA_ENVIRONMENT} not present!"
+    exit 1
+fi
+
+initialise_tmp_dirs .conda .mamba micromamba
 
 function inner() {
 
-    source "${CONDA_INSTALLATION_PATH}"/etc/profile.d/conda.sh
     ### Create the environment
     if [[ "${1}" == "--install" ]]; then
-        ${MAMBA} env create -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" -f environment.yml
+        ### Use --relocate-prefix to prevent micromamba helpfully resolving symlinks...
+        ${MAMBA} create -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" --relocate-prefix "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" -f "${ENV_FILE}" -y
         if [[ $? -ne 0 ]]; then
             echo "Error installing new environment"
             exit 1
@@ -28,8 +42,10 @@ function inner() {
     elif [[ "${1}" == "--update" ]]; then
         cat "${CONDA_INSTALLATION_PATH}"/envs/${FULLENV}/conda-meta/history >> "${CONDA_INSTALLATION_PATH}"/envs/${FULLENV}/conda-meta/history.log
         echo > "${CONDA_INSTALLATION_PATH}"/envs/${FULLENV}/conda-meta/history
-        conda env export -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" > deployed.old.yml
-        ${MAMBA} env update -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" -f environment.yml
+        ${MAMBA} env export -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" > deployed."${CONDA_ENVIRONMENT}".old.yml
+        ### micromamba forces this to be done in 2 steps - install for new packages, and update to check for updates
+        ${MAMBA} install -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" --relocate-prefix "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" -f "${ENV_FILE}" -y
+        ${MAMBA} update -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" --relocate-prefix "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" -f "${ENV_FILE}" -y
         if [[ $? -ne 0 ]]; then
             echo "Error updating new environment"
             exit 1
@@ -39,9 +55,9 @@ function inner() {
         rm -rf "${CONDA_SCRIPT_PATH}"/"${FULLENV}".d/{bin,overrides}
     fi
     
-    conda env export -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" > deployed.yml
+    ${MAMBA} env export -p "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}" > deployed."${CONDA_ENVIRONMENT}".yml
 
-    if [[ "${1}" == "--update" ]] && diff -q deployed.yml deployed.old.yml; then
+    if [[ "${1}" == "--update" ]] && diff -q deployed."${CONDA_ENVIRONMENT}".yml deployed."${CONDA_ENVIRONMENT}".old.yml; then
         echo "No changes detected in the environment, discarding update"
         exit 0
     fi
@@ -70,7 +86,7 @@ function inner() {
                     fn="${i//$apps_subdir\//}"
                     [[ -e $fn ]] && rm $fn
                     [[ "${fn}" != "${fn%/*}" ]] && mkdir -p "${fn%/*}"
-                    ln -s "${i}" "${fn}"
+                    ln -sf "${i}" "${fn}"
                 done
                 popd
 	    fi
@@ -107,13 +123,11 @@ function inner() {
     done
     popd
 
-    set +u
-    conda activate "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}"
-    set -u
+    if [[ -e "${SCRIPT_DIR}"/../environments/"${CONDA_ENVIRONMENT}"/build_inner.sh ]]; then
+        source "${SCRIPT_DIR}"/../environments/"${CONDA_ENVIRONMENT}"/build_inner.sh
+    fi
 
-    jupyter lab build
-
-    conda clean -a -f -y
+    ${MAMBA} clean -a -f -y
 
 }
 
@@ -148,7 +162,9 @@ if [[ -e  "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}.sqsh" ]]; then
     rm "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/"${FULLENV}"
     export DO_UPDATE="--update"
 else
-    mkdir -p "${ENV_INSTALLATION_PATH}"
+    ### conda-meta subdirectory must be present to trick micromamba into
+    ### thinking that the directory we're making is a conda directory
+    mkdir -p "${ENV_INSTALLATION_PATH}/conda-meta"
     export DO_UPDATE="--install"
 fi
 
@@ -181,9 +197,9 @@ if [[ -e "${CONTAINER_PATH}" ]]; then
     cp "${CONTAINER_PATH}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}"
 fi
 
-if [[ "${DO_UPDATE}" == "--update" ]] && diff -q deployed.yml deployed.old.yml; then
+if [[ "${DO_UPDATE}" == "--update" ]] && diff -q deployed."${CONDA_ENVIRONMENT}".yml deployed."${CONDA_ENVIRONMENT}".old.yml; then
     echo "No changes detected in the environment, discarding update"
-    cp deployed.yml deployed.old.yml "${BUILD_STAGE_DIR}"/
+    cp deployed."${CONDA_ENVIRONMENT}".yml deployed."${CONDA_ENVIRONMENT}".old.yml "${BUILD_STAGE_DIR}"/
     exit 0
 fi
 
@@ -203,12 +219,16 @@ cp "${FULLENV}".sqsh "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
 set_apps_perms "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp
 popd
 
-### Can't use ${CONDA_SCRIPT_PATH} or "${CONDA_INSTALLATION_PATH}" due to the need to string match on those paths
-### which they won't with the '/./' part required for arcane rsync magic
-construct_module_insert "${SINGULARITY_BINARY_PATH}" "${OVERLAY_BASE}" "${my_container}" "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp "${SCRIPT_DIR}"/condaenv.sh "${CONDA_INSTALLATION_PATH}" "${CONDA_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/"${FULLENV}" "${CONDA_BASE}"/"${SCRIPT_SUBDIR}"/"${FULLENV}".d/bin "${CONDA_OUTER_BASE}"/"${MODULE_SUBDIR}"/"${MODULE_NAME}"/."${FULLENV}"
+if [[ -e "${SCRIPT_DIR}"/../environments/"${CONDA_ENVIRONMENT}"/build_outer.sh ]]; then
+    source "${SCRIPT_DIR}"/../environments/"${CONDA_ENVIRONMENT}"/build_outer.sh
+fi
 
 rm "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/"${FULLENV}"
 ln -s /opt/conda/"${FULLENV}" "${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/envs/
+
+### Can't use ${CONDA_SCRIPT_PATH} or "${CONDA_INSTALLATION_PATH}" due to the need to string match on those paths
+### which they won't with the '/./' part required for arcane rsync magic
+construct_module_insert "${SINGULARITY_BINARY_PATH}" "${OVERLAY_BASE}" "${my_container}" "${BUILD_STAGE_DIR}"/"${FULLENV}".sqsh.tmp "${SCRIPT_DIR}"/condaenv.sh "${CONDA_INSTALLATION_PATH}" /opt/conda/"${FULLENV}" "${CONDA_BASE}"/"${SCRIPT_SUBDIR}"/"${FULLENV}".d/bin "${CONDA_OUTER_BASE}"/"${MODULE_SUBDIR}"/"${MODULE_NAME}"/."${FULLENV}"
 
 ### Set permissions on base environment
 set_apps_perms "${CONDA_OUTER_BASE}"
@@ -216,9 +236,9 @@ set_apps_perms "${CONDA_OUTER_BASE}"
 ### Archive base env
 pushd "${CONDA_OUTER_BASE}"
 ### WARNING: Non-standard tar extension: --acls
-tar --acls -cf "${BUILD_STAGE_DIR}"/conda_base.tar "${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${MODULE_SUBDIR}" "${SCRIPT_SUBDIR}"
+tar --acls -cf "${BUILD_STAGE_DIR}"/conda_base."${CONDA_ENVIRONMENT}".tar "${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${MODULE_SUBDIR}" "${SCRIPT_SUBDIR}"
 popd
 
-cp deployed.yml "${BUILD_STAGE_DIR}"/
+cp deployed."${CONDA_ENVIRONMENT}".yml "${BUILD_STAGE_DIR}"/
 ### || true so the script doesn't report failed if its doing a fresh install.
-[[ "${DO_UPDATE}" == "--update" ]] && cp deployed.old.yml "${BUILD_STAGE_DIR}"/ || true
+[[ "${DO_UPDATE}" == "--update" ]] && cp deployed."${CONDA_ENVIRONMENT}".old.yml "${BUILD_STAGE_DIR}"/ || true

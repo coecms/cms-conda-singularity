@@ -6,7 +6,6 @@ set package __CONDA_INSTALL_BASENAME__
 # Name of this module's environment
 set condaenv [lindex [split [module-info name] {/}] 1]
 set basedir "$prefix/$package/envs/$condaenv"
-set rootdir [ string map [ list /envs/$condaenv {} ] $basedir ]
 
 set mymod [file normalize [info script]]
 set mydir [file dirname $mymod]
@@ -17,7 +16,6 @@ set launcher $myscripts/launcher.sh
 
 module load singularity
 
-prepend-path PATH $rootdir/condabin
 prepend-path CONTAINER_OVERLAY_PATH $overlay_path
 prepend-path SINGULARITYENV_PREPEND_PATH $basedir/condabin
 
@@ -37,4 +35,6 @@ if { [ file exists $mydir/.$condaenv ] } {
 }
 
 ### Extra env to get other things working
-setenv  OMPI_MCA_orte_launch_agent $myscripts/orted
+setenv OMPI_MCA_orte_launch_agent $myscripts/orted
+setenv MAMBA_ROOT_PREFIX $prefix/$package
+setenv CONDA_EXE $prefix/$package/bin/micromamba

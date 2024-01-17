@@ -107,6 +107,10 @@ if [[ ! "${PBS_JOBFS}" ]]; then
     echo "Must be run inside a PBS job" && return
 fi
 
+if [[ ! "${CONDA_ENVIRONMENT}" ]]; then
+    echo "Error! CONDA_ENVIRONMENT must be defined" && return
+fi
+
 _parse_jobfs() {
     ### PBS_NCI_JOBFS var takes the form of nnnnnnXb
     multiplier=1

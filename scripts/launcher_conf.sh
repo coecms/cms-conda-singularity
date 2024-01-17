@@ -2,7 +2,7 @@
 export SINGULARITY_BINARY_PATH="/opt/singularity/bin/singularity"
 export CONTAINER_PATH="__CONDA_BASE__/__APPS_SUBDIR__/__CONDA_INSTALL_BASENAME__/etc/base.sif"
 if [[ "${CONDA_EXE}" ]]; then
-    export CONDA_BASE_ENV_PATH="${CONDA_EXE//\/bin\/conda/}"
+    export CONDA_BASE_ENV_PATH="${CONDA_EXE//\/bin\/micromamba/}"
 else
     export CONDA_BASE_ENV_PATH="__CONDA_BASE__/__APPS_SUBDIR__/__CONDA_INSTALL_BASENAME__"
 fi

@@ -1,0 +1,25 @@
+name: Build conda env
+on: 
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+jobs:
+  build:
+    name: Build environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build environment
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: gadi.nci.org.au
+          username: ${{secrets.GADI_USER}}
+          key: ${{secrets.DEPLOY_KEY}}
+          command_timeout: 120m
+          script: |
+            export SCRIPT_DIR=${{secrets.GADI_REPO_PATH}}/scripts
+            eval $( grep ADMIN_DIR $SCRIPT_DIR/install_config.sh )
+            eval $( grep JOB_LOG_DIR $SCRIPT_DIR/install_config.sh )
+            cd $JOB_LOG_DIR
+            qsub -N build_${{ inputs.environment }} -lncpus=1,mem=20GB,walltime=2:00:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR,CONDA_ENVIRONMENT=${{ inputs.environment }} -P kr06 -q copyq -Wblock=true -Wumask=037 "${SCRIPT_DIR}"/build.sh

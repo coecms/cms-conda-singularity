@@ -1,0 +1,71 @@
+name: Build and test conda env
+on: pull_request
+jobs:
+  generate_matrix:
+    uses: ./.github/workflows/get_changed_env.yml
+  
+  setup:
+    runs-on: ubuntu-latest
+    needs: generate_matrix
+    if: ${{ needs.generate_matrix.outputs.matrix != '{"include":[]}' }}
+    container:
+      image: quay.io/singularity/singularity:v3.11.4
+      options: --privileged
+    steps:
+      - name: Checkout repository
+        ### Latest at time of writing
+        uses: actions/checkout@v4
+      - name: Check if container definition has changed
+        id: changed-container-def
+        uses: tj-actions/changed-files@v41
+        with:
+          files_yaml: |
+            containerdef:
+              - container/container.def
+      - name: Build container if definition has changed
+        if: steps.changed-container-def.outputs.containerdef_any_changed == 'true'
+        run: |
+            echo ${{ needs.generate_matrix.outputs.matrix }}
+            sudo -E singularity build container/base.sif container/container.def
+      - name: Sync repository to Gadi
+        ### Latest at time of writing
+        uses: up9cloud/action-rsync@v1.3
+        env:
+          HOST: gadi.nci.org.au
+          TARGET: ${{secrets.GADI_REPO_PATH}}
+          KEY: ${{secrets.DEPLOY_KEY}}
+          USER: ${{secrets.GADI_USER}}
+      - name: Create Admin dirs on Gadi
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: gadi.nci.org.au
+          username: ${{secrets.GADI_USER}}
+          key: ${{secrets.DEPLOY_KEY}}
+          script: |
+            source ${{secrets.GADI_REPO_PATH}}/scripts/install_config.sh
+            source ${{secrets.GADI_REPO_PATH}}/scripts/functions.sh
+            mkdir -p $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
+            set_admin_perms $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
+
+  build:
+    needs: [ generate_matrix, setup ]
+    uses: ./.github/workflows/build.yml
+    with:
+      environment: ${{ matrix.environment }}
+    secrets: inherit
+    if: ${{ needs.generate_matrix.outputs.matrix != '{"include":[]}' }}
+    strategy:
+      matrix: ${{fromJson(needs.generate_matrix.outputs.matrix)}}
+      max-parallel: 1
+      fail-fast: false
+  test:
+    needs: [ generate_matrix, build ]
+    uses: ./.github/workflows/test.yml
+    with:
+      environment: ${{ matrix.environment }}
+    secrets: inherit
+    if: ${{ needs.generate_matrix.outputs.matrix != '{"include":[]}' }}
+    strategy:
+      matrix: ${{fromJson(needs.generate_matrix.outputs.matrix)}}
+      max-parallel: 1
+      fail-fast: false

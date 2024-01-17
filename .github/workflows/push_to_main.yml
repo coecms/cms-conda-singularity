@@ -1,0 +1,35 @@
+name: Deploy conda env
+on:
+  push:
+    branches: main
+jobs:
+  generate_matrix:
+    uses: ./.github/workflows/get_changed_env.yml
+
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        ### Latest at time of writing
+        uses: actions/checkout@v4
+      - name: Sync repository to Gadi
+        ### Latest at time of writing
+        uses: up9cloud/action-rsync@v1.3
+        env:
+          HOST: gadi.nci.org.au
+          TARGET: ${{secrets.GADI_REPO_PATH}}
+          KEY: ${{secrets.DEPLOY_KEY}}
+          USER: ${{secrets.GADI_USER}}
+  
+  deploy:
+    needs: [ generate_matrix, setup ]
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: ${{ matrix.environment }}
+    secrets: inherit
+    if: ${{ needs.generate_matrix.outputs.matrix != '{"include":[]}' }}
+    strategy: 
+      matrix: ${{fromJson(needs.generate_matrix.outputs.matrix)}}
+      max-parallel: 1
+      fail-fast: false
+    
