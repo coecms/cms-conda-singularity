@@ -44,6 +44,7 @@ Bootstrap: scratch
         mkdir -p ${SINGULARITY_ROOTFS}/opt/conda/analysis3-23.04
         mkdir -p ${SINGULARITY_ROOTFS}/opt/conda/analysis3-23.07
         mkdir -p ${SINGULARITY_ROOTFS}/opt/conda/analysis3-23.10
+        mkdir -p ${SINGULARITY_ROOTFS}/opt/conda/analysis3-24.01
 
 %runscript
         /usr/bin/bash -l

@@ -36,3 +36,9 @@ if [[ "${CONDA_ENVIRONMENT}" ]]; then
         exit 1
     fi
 fi
+
+### Define any undefined arrays
+[[ -z ${rpms_to_remove+x} ]]              && declare -a rpms_to_remove=()              || true
+[[ -z ${replace_from_apps+x} ]]           && declare -a replace_from_apps=()           || true
+[[ -z ${outside_commands_to_include+x} ]] && declare -a outside_commands_to_include=() || true
+[[ -z ${outside_files_to_copy+x} ]]       && declare -a outside_files_to_copy=()       || true

@@ -1,8 +1,7 @@
 ### config.sh MUST provide the following:
-### $ENVIRONMENT
 ### $FULLENV
 ###
-### Arrays (can be empty)
+### Arrays used by the build system (optional, can be empty)
 ### rpms_to_remove
 ### replace_from_apps
 ### outside_commands_to_include
