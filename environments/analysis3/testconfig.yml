@@ -48,6 +48,7 @@ skip:
 - attrdict ### Deprecated but still erroneously bought in by wavespectra - not used by anything else
 - skimage.future.graph ### Thanks for raising a module error to tell me that you've moved this
 - numba.core.rvsdg_frontend ### Not supported in Python3.10
+- xgboost.testing ### Has an 'pytest.importorskip' call when imported, causing the whole thing to report skipped
 
 # Preload these modules before testing to avoid weird python issues
 preload:
@@ -75,19 +76,6 @@ exception:
 - metpy.plots  # While Issue #21 unresolved
 - httpx
 - sanic
-- tensorflow.estimator
-- tensorflow._api.v2.compat.v1.estimator
-- tensorflow._api.v2.compat.v1.compat.v1.estimator
-- tensorflow._api.v2.compat.v1.compat.v2.estimator
-- tensorflow._api.v2.compat.v2.estimator
-- tensorflow._api.v2.compat.v2.compat.v1.estimator
-- tensorflow._api.v2.compat.v2.compat.v2.estimator
-- tensorflow.compat.v1.estimator
-- tensorflow.compat.v1.compat.v1.estimator
-- tensorflow.compat.v1.compat.v2.estimator
-- tensorflow.compat.v2.estimator
-- tensorflow.compat.v2.compat.v1.estimator
-- tensorflow.compat.v2.compat.v2.estimator
 - pyparsing.diagrams
 - pysal.explore.esda
 - pysal.explore.segregation

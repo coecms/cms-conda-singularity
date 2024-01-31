@@ -95,7 +95,7 @@ def import_config(filename):
     except IOError as exc:
         if exc.errno == errno.ENOENT:
             print('Warning: config file {0} not found!'
-                  .format(config_fname))
+                  .format(filename))
             config = {}
         else:
             raise
@@ -119,7 +119,7 @@ def handle_error(name):
 
 def test_walk_packages():
     global exception
-    config = import_config('testconfig.yml')
+    config = import_config('../environments/'+ os.environ['CONDA_ENVIRONMENT'] + '/testconfig.yml')
     for mod in config.get('preload',[]):
         try:
             if debug: print("Preloading {}".format(mod))
@@ -127,8 +127,8 @@ def test_walk_packages():
         except:
             print("Error preloading {}".format(mod))
 
-    exception = set(config.get('exception',None))
-    skip = set(config.get('skip',None))
+    exception = set(config.get('exception',[]))
+    skip = set(config.get('skip',[]))
     if debug: print('Exception: {}'.format(exception))
     if debug: print('Skip: {}'.format(skip))
     for importer, name, ispkg in my_walk_packages(onerror=handle_error,skip=skip):
@@ -139,7 +139,7 @@ def test_walk_packages():
         warnings.warn(UserWarning(warnstring))
 
 def test_import():
-    config = import_config('testconfig.yml')
+    config = import_config('../environments/'+ os.environ['CONDA_ENVIRONMENT'] + '/testconfig.yml')
 
     for info in iter_modules():
         if info.ispkg and info.name not in config['skip']:

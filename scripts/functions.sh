@@ -117,11 +117,14 @@ function construct_module_insert() {
     script_path="${8}"
     module_path="${9}"
 
+    declare -a discard_paths=( "/bin" "/usr/bin" "/condabin" )
+    declare -a discard_vars=( "MODULEPATH" "_" "PWD" "SHLVL" )
+
     while read line; do
         key="${line%%=*}"
         value="${line#*=}"
         ### Skip these environment variables
-        in_array "MODULEPATH" "_" "PWD" "SHLVL" "${key}" && continue
+        in_array "${discard_vars[@]}" "${key}" && continue
         ### Prepend to these variables
         if [[ $key =~ .PATH$ ]]; then
             echo prepend-path $key $value
@@ -131,7 +134,7 @@ function construct_module_insert() {
         ### Treat path specially - remove system paths and retain order
         elif [[ "${key}" == "PATH" ]]; then
             while IFS= read -r -d: entry; do
-                in_array "/bin" "/usr/bin" "${entry}" && continue
+                in_array "${discard_paths[@]}" "${entry}" && continue
                 if [[ $entry =~ $condaenv ]]; then
                     echo prepend-path PATH $script_path
                 else
@@ -197,4 +200,19 @@ function copy_and_replace_if_changed() {
         mv "${out}" "${final_out}"
     fi
 
+}
+
+function initialise_tmp_dirs() {
+
+    if [[ "${PBS_JOBFS}" ]]; then
+        relink_cmds=""
+        for dir in "$@"; do
+            relink_cmds="${relink_cmds}rm ~/${dir}; ln -s $( readlink ~/${dir} ) ~/${dir}; "
+            rm ~/"${dir}"
+            mkdir -p "${PBS_JOBFS}"/"${dir}"
+            ln -s "${PBS_JOBFS}"/"${dir}" ~
+            ### Race condition
+        done
+        trap "${relink_cmds}" EXIT
+    fi
 }

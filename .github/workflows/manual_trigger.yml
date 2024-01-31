@@ -1,0 +1,54 @@
+name: Force environment update
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to update"
+        required: true
+        type: string
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Sync repository to Gadi
+        uses: up9cloud/action-rsync@v1.3
+        env:
+          HOST: gadi.nci.org.au
+          TARGET: ${{secrets.GADI_REPO_PATH}}
+          KEY: ${{secrets.DEPLOY_KEY}}
+          USER: ${{secrets.GADI_USER}}
+      - name: Create Admin dirs on Gadi
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: gadi.nci.org.au
+          username: ${{secrets.GADI_USER}}
+          key: ${{secrets.DEPLOY_KEY}}
+          script: |
+            source ${{secrets.GADI_REPO_PATH}}/scripts/install_config.sh
+            source ${{secrets.GADI_REPO_PATH}}/scripts/functions.sh
+            mkdir -p $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
+            set_admin_perms $ADMIN_DIR $JOB_LOG_DIR $BUILD_STAGE_DIR
+
+  build:
+    needs: setup
+    uses: ./.github/workflows/build.yml
+    with:
+      environment: ${{ inputs.environment }}
+    secrets: inherit
+
+  test:
+    needs: build
+    uses: ./.github/workflows/test.yml
+    with:
+      environment: ${{ inputs.environment }}
+    secrets: inherit
+
+  deploy:
+    needs: test
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: ${{ inputs.environment }}
+    secrets: inherit
