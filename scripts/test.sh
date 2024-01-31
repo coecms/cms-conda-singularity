@@ -36,7 +36,7 @@ function inner() {
         test_pid=$!
 
         while ! [[ -e "${TEST_OUT_FILE}" ]]; do sleep 5; done
-        [[ -e /proc/"${test_pid}" ]] && kill -15 "${test_pid}"
+        [[ -e /proc/"${test_pid}" ]] && kill -9 "${test_pid}"
         wait
     else
         echo "py.test not present - skipping"
