@@ -11,8 +11,21 @@ function in_array() {
     return 1
 }
 
-wrapper_bin=$( realpath "${0%/*}" )
+function debug_print() {
+    echo "$@" 1>&2
+}
+
+if [[ "${CMS_CONDA_DEBUG_SCRIPTS}" ]]; then
+    debug=debug_print
+else
+    debug=true
+fi
+
+wrapper_path=$( realpath "${0}" )
+wrapper_bin=${wrapper_path%/*}
+$debug "wrapper_bin = " "${wrapper_bin}"
 conf_file="${wrapper_bin}"/launcher_conf.sh
+$debug "conf_file = " "${conf_file}"
 
 source "${conf_file}"
 
@@ -23,25 +36,30 @@ while [[ $# -gt 0 ]]; do
         "--cms_singularity_overlay_path_override")
             ### Sometimes we do not want to use the 'correct' container
             export CONTAINER_OVERLAY_PATH_OVERRIDE=1
+            $debug "cms_singularity_overlay_path_override=1"
             shift
             ;;
         "--cms_singularity_overlay_path")
             ### From time to time we need to manually specify an overlay filesystem, handle that here:
             export CONTAINER_OVERLAY_PATH="${2}"
+            $debug "cms_singularity_overlay_path="${CONTAINER_OVERLAY_PATH}
             shift 2
             ;;
         "--cms_singularity_in_container_path")
             ### Set path manually
             export PATH="${2}"
+            $debug "cms_singularity_in_container_path="${PATH}
             shift 2
             ;;
         "--cms_singularity_launcher_override")
             ### Override the launcher script name
             export LAUNCHER_SCRIPT="${2}"
+            $debug "cms_singularity_launcher_override="${LAUNCHER_SCRIPT}
             shift 2
             ;;
         "--cms_singularity_singularity_path")
             export SINGULARITY_BINARY_PATH="${2}"
+            $debug "cms_singularity_singularity_path="${SINGULARITY_BINARY_PATH}
             shift 2
             ;;
         *)
@@ -50,6 +68,8 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+$debug "PROG_ARGS =" "${PROG_ARGS[@]}"
 
 if ! [[ "${SINGULARITY_BINARY_PATH}" ]]; then
     module load singularity
@@ -67,6 +87,8 @@ else
     cmd_to_run+=( "${PROG_ARGS[@]}" )
 fi
 
+$debug "cmd_to_run = " "${cmd_to_run[@]}"
+
 ### Handle the case where we've been invoked directly. Make sure the container
 ### we need is on path, and that CONDA_BASE is set so that the right thing
 ### runs in the container. If we haven't been directly invoked, this does
@@ -77,8 +99,13 @@ fi
 ### somewhere else (e.g. jobfs), the one on gdata will be mounted but not used.
 myenv=$( basename "${wrapper_bin%/*}" ".d" )
 if ! [[ "${CONTAINER_OVERLAY_PATH_OVERRIDE}" ]]; then
-    [[ :"${CONTAINER_OVERLAY_PATH}": =~ :"${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh: ]] || export CONTAINER_OVERLAY_PATH="${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh:${CONTAINER_OVERLAY_PATH}
+    if ! [[ :"${CONTAINER_OVERLAY_PATH}": =~ :"${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh: ]]; then
+        [[ -r "${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh ]] && export CONTAINER_OVERLAY_PATH="${CONDA_BASE_ENV_PATH}"/envs/"${myenv}".sqsh:${CONTAINER_OVERLAY_PATH}
+    fi
 fi
+
+$debug "CONTAINER_OVERLAY_PATH after override check = " ${CONTAINER_OVERLAY_PATH}
+
 export CONDA_BASE="${CONDA_BASE_ENV_PATH}/envs/${myenv}"
 
 if ! [[ -x "${SINGULARITY_BINARY_PATH}" ]]; then
@@ -90,16 +117,19 @@ if ! [[ -x "${SINGULARITY_BINARY_PATH}" ]]; then
     ### bin directory of the active conda env, so just reset the path to that but keep the 
     ### original argv[0] so virtual envs work.
     cmd_to_run[0]="${CONDA_BASE}/bin/${cmd_to_run[0]##*/}"
+    $debug "Short circuit detected, running: " "exec -a" "${0}" "${cmd_to_run[@]}"
     exec -a "${0}" "${cmd_to_run[@]}"
 fi
 
 ### Handle some functions separately.
 if [[ -e ${wrapper_bin}/../overrides/"${cmd_to_run[0]##*/}".sh ]]; then
+    $debug "Running override function: " ${wrapper_bin}/../overrides/"${cmd_to_run[0]##*/}".sh "${cmd_to_run[@]:1}"
     exec ${wrapper_bin}/../overrides/"${cmd_to_run[0]##*/}".sh "${cmd_to_run[@]:1}"
 fi
 
 ### Add some additional config for some functions
 if [[ -e "${wrapper_bin}"/../overrides/"${cmd_to_run[0]##*/}".config.sh ]]; then
+    $debug "Loading additional configuration: " "${wrapper_bin}"/../overrides/"${cmd_to_run[0]##*/}".config.sh
     . "${wrapper_bin}"/../overrides/"${cmd_to_run[0]##*/}".config.sh
 fi
 
@@ -114,9 +144,22 @@ while IFS= read -r -d: i; do
 done<<<"${PATH%:}:"
 export SINGULARITYENV_PREPEND_PATH=${SINGULARITYENV_PREPEND_PATH#:*}
 
+$debug "SINGULARITYENV_PREPEND_PATH= " ${SINGULARITYENV_PREPEND_PATH}
+
 overlay_args=""
 while IFS= read -r -d: i; do
     overlay_args="${overlay_args}--overlay=${i} "
 done<<<"${CONTAINER_OVERLAY_PATH%:}:"
 
-"$SINGULARITY_BINARY_PATH" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge ${overlay_args} "${CONTAINER_PATH}" "${cmd_to_run[@]}"
+$debug "overlay_args= " ${overlay_args}
+
+bind_str=""
+for bind_dir in "${bind_dirs[@]}"; do
+    [[ -d "${bind_dir}" ]] && bind_str="${bind_str}${bind_dir},"
+done
+bind_str=${bind_str%,}
+
+$debug "binding args= " ${bind_str}
+
+$debug "Singularity invocation: " "$SINGULARITY_BINARY_PATH" -s exec --bind "${bind_str}" ${overlay_args} "${CONTAINER_PATH}" "${cmd_to_run[@]}"
+"$SINGULARITY_BINARY_PATH" -s exec --bind "${bind_str}" ${overlay_args} "${CONTAINER_PATH}" "${cmd_to_run[@]}"

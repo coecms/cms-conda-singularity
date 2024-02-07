@@ -1,16 +1,16 @@
-name: Deploy conda env
-on:
+name: Test conda env
+on: 
   workflow_call:
     inputs:
       environment:
         required: true
         type: string
 jobs:
-  deploy:
-    name: Deploy environment
+  test:
+    name: Test environment
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy environment
+      - name: Test environment
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: gadi.nci.org.au
@@ -18,7 +18,7 @@ jobs:
           key: ${{secrets.DEPLOY_KEY}}
           script: |
             export SCRIPT_DIR=${{secrets.GADI_REPO_PATH}}/scripts
-            export CONDA_ENVIRONMENT=${{ inputs.environment }}
             eval $( grep ADMIN_DIR $SCRIPT_DIR/install_config.sh )
-            eval $( grep BUILD_STAGE_DIR $SCRIPT_DIR/install_config.sh )
-            "${SCRIPT_DIR}"/deploy.sh
+            eval $( grep JOB_LOG_DIR $SCRIPT_DIR/install_config.sh )
+            cd $JOB_LOG_DIR
+            qsub -N test_${{ inputs.environment }} -lncpus=4,mem=20GB,walltime=0:20:00,jobfs=50GB,storage=gdata/v45+scratch/v45+gdata/hh5+scratch/hh5 -v SCRIPT_DIR,CONDA_ENVIRONMENT=${{ inputs.environment }} -P kr06 -Wblock=true -Wumask=037 "${SCRIPT_DIR}"/test.sh

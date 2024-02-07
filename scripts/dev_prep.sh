@@ -107,6 +107,10 @@ if [[ ! "${PBS_JOBFS}" ]]; then
     echo "Must be run inside a PBS job" && return
 fi
 
+if [[ ! "${CONDA_ENVIRONMENT}" ]]; then
+    echo "Error! CONDA_ENVIRONMENT must be defined" && return
+fi
+
 _parse_jobfs() {
     ### PBS_NCI_JOBFS var takes the form of nnnnnnXb
     multiplier=1
@@ -168,14 +172,40 @@ _initialise() {
 }
 
 function launch() {
-    "${SINGULARITY_BINARY_PATH}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" bash
+    if [[ -e "${CONTAINER_PATH}" ]]; then
+    ### New container, use that
+        my_container="${CONTAINER_PATH}"
+    else
+        my_container="${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}"
+    fi
+
+    bind_str=""
+    for bind_dir in "${bind_dirs[@]}"; do
+        [[ -d "${bind_dir}" ]] && bind_str="${bind_str}${bind_dir},"
+    done
+    bind_str="${bind_str}${OVERLAY_BASE}":/g
+
+    "${SINGULARITY_BINARY_PATH}" -s exec --bind "${bind_str}" "${my_container}" bash
 }
 
 function finalise() {
-    "${SINGULARITY_BINARY_PATH}" -s exec --bind /etc,/half-root,/local,/ram,/run,/system,/usr,/var/lib/sss,/var/run/munge,/var/lib/rpm,"${OVERLAY_BASE}":/g "${CONTAINER_PATH}" bash "${script_path}" --inner
+    if [[ -e "${CONTAINER_PATH}" ]]; then
+        ### New container, use that
+        my_container="${CONTAINER_PATH}"
+    else
+        my_container="${CONDA_OUTER_BASE}"/"${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}"/etc/"${CONTAINER_PATH##*/}"
+    fi
+
+    bind_str=""
+    for bind_dir in "${bind_dirs[@]}"; do
+        [[ -d "${bind_dir}" ]] && bind_str="${bind_str}${bind_dir},"
+    done
+    bind_str="${bind_str}${OVERLAY_BASE}":/g
+
+    "${SINGULARITY_BINARY_PATH}" -s exec --bind "${bind_str}" "${my_container}" bash "${script_path}" --inner
     
     new_squashfs=$( mktemp -u "${PBS_JOBFS}"/"${FULLENV}".XXXXXX.sqsh )
-    mksquashfs squashfs-root $new_squashfs -b 1M -no-recovery -noI -noD -noF -noX -processors 8 2>/dev/null
+    mksquashfs squashfs-root $new_squashfs -no-fragments -no-duplicates -no-sparse -no-exports -no-recovery -noI -noD -noF -noX -processors 8 2>/dev/null
     echo "Updated squashfs created at "$new_squashfs
     pushd "${CONDA_OUTER_BASE}"
     tar --acls -cf "${PBS_JOBFS}"/conda_base.tar "${APPS_SUBDIR}"/"${CONDA_INSTALL_BASENAME}" "${MODULE_SUBDIR}" "${SCRIPT_SUBDIR}"

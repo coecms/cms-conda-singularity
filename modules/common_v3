@@ -1,24 +1,23 @@
 #%Module1.0
-source /opt/Modules/extensions/extensions.tcl
 
-set-basedir -root __CONDA_BASE__/__APPS_SUBDIR__ -package __CONDA_INSTALL_BASENAME__ -version envs/$::version
-set rootdir [ string map [ list /envs/$::version {} ] $::basedir ]
-
-inhibit-self-conflict
-
-module load singularity
-
-prepend-path PATH $rootdir/condabin
+#set-basedir -root __CONDA_BASE__/__APPS_SUBDIR__ -package __CONDA_INSTALL_BASENAME__ -version envs/$::version
+set prefix __CONDA_BASE__/__APPS_SUBDIR__
+set package __CONDA_INSTALL_BASENAME__
+# Name of this module's environment
+set condaenv [lindex [split [module-info name] {/}] 1]
+set basedir "$prefix/$package/envs/$condaenv"
 
 set mymod [file normalize [info script]]
 set mydir [file dirname $mymod]
-set myscripts [ file normalize __CONDA_BASE__/__SCRIPT_SUBDIR__/$::version.d/bin ]
-set overlay_path [ string map {/conda/ /envs/} $::basedir ].sqsh
+set myscripts [ file normalize __CONDA_BASE__/__SCRIPT_SUBDIR__/$condaenv.d/bin ]
+set overlay_path [ string map {/conda/ /envs/} $basedir ].sqsh
 
 set launcher $myscripts/launcher.sh
 
+module load singularity
+
 prepend-path CONTAINER_OVERLAY_PATH $overlay_path
-prepend-path SINGULARITYENV_PREPEND_PATH $::basedir/condabin
+prepend-path SINGULARITYENV_PREPEND_PATH $basedir/condabin
 
 if {[module-info mode remove]} {
     if {$env(CONDA_SHLVL) > 1} {
@@ -28,9 +27,6 @@ if {[module-info mode remove]} {
     }
 }
 
-# Name of this module's environment
-set condaenv [lindex [split [module-info name] {/}] 1]
-
 if { [ file exists $mydir/.$condaenv ] } {
     source $mydir/.$condaenv
 } else {
@@ -39,4 +35,6 @@ if { [ file exists $mydir/.$condaenv ] } {
 }
 
 ### Extra env to get other things working
-setenv  OMPI_MCA_orte_launch_agent $myscripts/orted
+setenv OMPI_MCA_orte_launch_agent $myscripts/orted
+setenv MAMBA_ROOT_PREFIX $prefix/$package
+setenv CONDA_EXE $prefix/$package/bin/micromamba
