@@ -1,4 +1,4 @@
-# Modules test will not try to import
+# Modules test will not try to import (should be cleaned)
 skip:
 # Cause errors and don't throw exceptions cleanly
 - access_nri_intake
