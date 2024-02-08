@@ -64,14 +64,16 @@ function inner() {
 
     pushd "${ENV_INSTALLATION_PATH}"
     ### Get rid of stuff from packages we don't want
-    for dir in bin lib etc libexec include; do 
-        pushd $dir
-        for i in $( rpm -qli "${rpms_to_remove[@]}" ); do 
-            fn=$( basename $i )
-            [[ -f $fn ]] && rm $fn
-            [[ -d $fn ]] && rm -rf $fn
-        done
-        popd
+    for dir in bin lib etc libexec include; do
+	if [[ -d "${dir}" ]]; then
+            pushd $dir
+            for i in $( rpm -qli "${rpms_to_remove[@]}" ); do
+                fn=$( basename $i )
+                [[ -f $fn ]] && rm $fn
+                [[ -d $fn ]] && rm -rf $fn
+            done
+            popd
+	fi
     done
 
     ### Replace things from apps
