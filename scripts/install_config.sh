@@ -4,7 +4,7 @@ export ADMIN_DIR="${ADMIN_DIR:-/g/data/xp65/admin/med_conda/admin}"
 export CONDA_TEMP_PATH="${PBS_JOBFS:-${CONDA_TEMP_PATH}}"
 export SCRIPT_DIR="${SCRIPT_DIR:-$PWD}"
 
-export SCRIPT_SUBDIR="apps1/med_conda_scripts"
+export SCRIPT_SUBDIR="apps/med_conda_scripts"
 export MODULE_SUBDIR="modules"
 export APPS_SUBDIR="apps"
 export CONDA_INSTALL_BASENAME="med_conda"
