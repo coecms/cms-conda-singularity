@@ -206,11 +206,20 @@ function initialise_tmp_dirs() {
     if [[ "${PBS_JOBFS}" ]]; then
         relink_cmds=""
         for dir in "$@"; do
-            relink_cmds="${relink_cmds}rm ~/${dir}; ln -s $( readlink ~/${dir} ) ~/${dir}; "
-            rm ~/"${dir}"
-            mkdir -p "${PBS_JOBFS}"/"${dir}"
-            ln -s "${PBS_JOBFS}"/"${dir}" ~
-            ### Race condition
+            if [[ -h ~/"${dir}" ]]; then
+                relink_cmds="${relink_cmds}rm ~/${dir}; ln -s $( readlink ~/${dir} ) ~/${dir}; "
+                rm ~/"${dir}"
+                mkdir -p "${PBS_JOBFS}"/"${dir}"
+                ln -s "${PBS_JOBFS}"/"${dir}" ~
+                ### Race condition
+            elif [[ -d ~/"${dir}" ]]; then
+                echo "Warning! ~/${dir} is a directory (not a symlink). This can significantly increase "
+                echo "installation time of conda environments."
+            else
+                relink_cmds="${relink_cmds}rm ~/${dir}; "
+                mkdir -p "${PBS_JOBFS}"/"${dir}"
+                ln -s "${PBS_JOBFS}"/"${dir}" ~
+            fi
         done
         trap "${relink_cmds}" EXIT
     fi

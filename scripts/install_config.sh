@@ -6,7 +6,7 @@ export SCRIPT_DIR="${SCRIPT_DIR:-$PWD}"
 
 export SCRIPT_SUBDIR="apps1/med_conda_scripts"
 export MODULE_SUBDIR="modules"
-export APPS_SUBDIR="apps1"
+export APPS_SUBDIR="apps"
 export CONDA_INSTALL_BASENAME="med_conda"
 export MODULE_NAME="conda"
 
