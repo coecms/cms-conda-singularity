@@ -21,6 +21,7 @@ skip:
 - sqlalchemy.testing
 - httpx
 - sanic
+- rsvdg_frontend
 - tests # random tests from black?
  # - cupy # Disable when testing locally
  # - cupyx # ditto
