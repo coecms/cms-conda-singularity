@@ -50,6 +50,7 @@ skip:
 - esmf_regrid
 - esmvaltool.diag_scripts
 - med_diagnostics
+- numba
 
 # Preload these modules before testing to avoid weird python issues
 preload:
