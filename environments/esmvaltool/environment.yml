@@ -187,6 +187,7 @@ dependencies:
   - julia=1.8.5=h783901f_0
   - jupyter_client=8.6.0=pyhd8ed1ab_0
   - jupyter_core=5.5.1=py311h38be061_0
+  - jupyterlab
   - jupyterlab_pygments=0.3.0=pyhd8ed1ab_0
   - jxrlib=1.1=h7f98852_2
   - kealib=1.5.1=h3845be2_3
