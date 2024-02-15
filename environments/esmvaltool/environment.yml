@@ -312,6 +312,7 @@ dependencies:
   - netcdf-fortran=4.6.1=nompi_h4f3791c_100
   - netcdf4=1.6.4=nompi_py311h4d7c953_100
   - networkx=3.2.1=pyhd8ed1ab_0
+  - nodejs
   - nodeenv=1.8.0=pyhd8ed1ab_0
   - nspr=4.35=h27087fc_0
   - nss=3.96=h1d7d5a4_0
