@@ -391,7 +391,7 @@ dependencies:
   - pytest-metadata=3.0.0=pyhd8ed1ab_1
   - pytest-mock=3.12.0=pyhd8ed1ab_0
   - pytest-xdist=3.5.0=pyhd8ed1ab_0
-  - python=3.11.6=hab00c5b_0_cpython
+  - python>=3.9
   - python-build=1.0.3=pyhd8ed1ab_0
   - python-cdo=1.6.0=pyhd8ed1ab_0
   - python-dateutil=2.8.2=pyhd8ed1ab_0
