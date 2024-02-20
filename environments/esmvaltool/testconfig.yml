@@ -52,6 +52,7 @@ skip:
 - med_diagnostics
 - numba
 - urllib3
+- pip
 
 # Preload these modules before testing to avoid weird python issues
 preload:
