@@ -53,6 +53,7 @@ skip:
 - numba
 - urllib3
 - pip
+- prompt_toolkit
 
 # Preload these modules before testing to avoid weird python issues
 preload:
