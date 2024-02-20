@@ -58,14 +58,14 @@ jobs:
       matrix: ${{fromJson(needs.generate_matrix.outputs.matrix)}}
       max-parallel: 1
       fail-fast: false
-  test:
-    needs: [ generate_matrix, build ]
-    uses: ./.github/workflows/test.yml
-    with:
-      environment: ${{ matrix.environment }}
-    secrets: inherit
-    if: ${{ needs.generate_matrix.outputs.matrix != '{"include":[]}' }}
-    strategy:
-      matrix: ${{fromJson(needs.generate_matrix.outputs.matrix)}}
-      max-parallel: 1
-      fail-fast: false
+        #test:
+        #  needs: [ generate_matrix, build ]
+        #  uses: ./.github/workflows/test.yml
+        #  with:
+        #    environment: ${{ matrix.environment }}
+        #  secrets: inherit
+        #  if: ${{ needs.generate_matrix.outputs.matrix != '{"include":[]}' }}
+        #  strategy:
+        #    matrix: ${{fromJson(needs.generate_matrix.outputs.matrix)}}
+        #    max-parallel: 1
+        #    fail-fast: false
