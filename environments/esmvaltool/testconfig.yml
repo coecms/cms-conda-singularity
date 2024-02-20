@@ -54,6 +54,7 @@ skip:
 - urllib3
 - pip
 - prompt_toolkit
+- prospector
 
 # Preload these modules before testing to avoid weird python issues
 preload:
