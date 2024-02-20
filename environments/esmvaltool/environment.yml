@@ -604,7 +604,6 @@ dependencies:
   - typing_extensions=4.9.0=pyha770c72_0
   - tzcode=2023c=h0b41bf4_0
   - tzdata=2023c=h71feb2d_0
-  - coecms::ucx-py
   - udunits2=2.2.28=h40f5838_3
   - ujson=5.9.0=py311hb755f60_0
   - ukkonen=1.0.1=py311h9547e67_4
@@ -661,3 +660,4 @@ dependencies:
   - zstd=1.5.5=hfc55251_0
   - pip:
       - esmvaltool==2.10.0
+      - git+https://github.com/rapidsai/ucx-py.git@branch-0.35
