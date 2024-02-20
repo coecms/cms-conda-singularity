@@ -358,7 +358,7 @@ dependencies:
   - psy-maps=1.4.2=pyhd8ed1ab_0
   - psy-reg=1.4.0=py311h38be061_3
   - psy-simple=1.4.1=py311h38be061_2
-  - psycopg
+  - psycopg2
   - psyplot=1.4.3=py311h38be061_1
   - pthread-stubs=0.4=h36c2ea0_1001
   - py-cordex=0.6.6=pyhd8ed1ab_0
