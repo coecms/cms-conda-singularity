@@ -662,4 +662,5 @@ dependencies:
   - zstd=1.5.5=hfc55251_0
   - pip:
       - esmvaltool==2.10.0
+      - sacpy
       - git+https://github.com/rapidsai/ucx-py.git@branch-0.35
