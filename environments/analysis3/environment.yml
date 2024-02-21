@@ -103,7 +103,7 @@ dependencies:
 - nodejs
 - cfgrib
 - h5netcdf
-- intake
+- intake==0.7.0 ### https://github.com/intake/intake/issues/787
 - gridfill
 - xgcm
 - xrft
