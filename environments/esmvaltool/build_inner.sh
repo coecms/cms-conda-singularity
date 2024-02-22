@@ -7,7 +7,7 @@ set -u
 
 jupyter lab build
 
-pushd "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}lib/python3.11/site-packages/esmvaltool"
+pushd "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}/lib/python3.11/site-packages/esmvaltool"
 rm config-references.yml
 ln -sf /g/data/xp65/public/apps/esmvaltool/config/config-references.yml config-references.yml
 pushd -
