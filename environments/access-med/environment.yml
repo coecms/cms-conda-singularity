@@ -70,7 +70,7 @@ dependencies:
 - med-diagnostics==0.0.1 # pining for now
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
-  - access-med-utils
+  - git+https://github.com/ACCESS-NRI/MED-utils
  
   
 # Julia (dependencies installed by separate script)
