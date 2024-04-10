@@ -27,7 +27,7 @@ dependencies:
 - pygrib
 - pyhdf
 - pytest
-- scipy
+- scipy<1.13.0
 - seaborn
 - xarray>2023.9 ### py-cordex fixes xarray at != 2023.9.0 - set this to prevent downgrade
 - jupyter
@@ -286,5 +286,6 @@ dependencies:
 - python-kaleido
 - numba<0.59 ### pysal -> giddy -> quantecon is broken with numba 0.59
 - accessnri::access-med-tools
+- crick ### Unlisted dependency for dask-expr
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
