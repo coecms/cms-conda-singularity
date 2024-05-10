@@ -103,7 +103,7 @@ dependencies:
 - nodejs
 - cfgrib
 - h5netcdf
-- intake==0.7.0 ### https://github.com/intake/intake/issues/787
+- intake
 - gridfill
 - xgcm
 - xrft
@@ -284,7 +284,7 @@ dependencies:
 - pdbufr
 - matplotlib-scalebar
 - python-kaleido
-- numba<0.59 ### pysal -> giddy -> quantecon is broken with numba 0.59
+- numba
 - accessnri::access-med-tools
 - crick ### Unlisted dependency for dask-expr
 - regional-mom6
