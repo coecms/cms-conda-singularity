@@ -69,7 +69,7 @@ dependencies:
 - matplotlib
 #- matplotlib>=3.5.2|<=3.4.3  # pinned to solve  https://github.com/matplotlib/matplotlib/issues/21917
 - dreqpy
-- pint
+- pint<0.24 ### https://github.com/Ouranosinc/xclim/issues/1771
 - pycodestyle 
 - nc-time-axis
 - jq
