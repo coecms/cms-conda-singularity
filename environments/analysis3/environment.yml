@@ -128,7 +128,7 @@ dependencies:
 - panel
 - xrft
 - git
-- openmpi
+- openmpi==4.1.6
 - mpi4py
 - palettable
 - xlrd
@@ -168,7 +168,7 @@ dependencies:
 - rasterstats
 - windrose
 - pyam
-- pyarrow
+- pyarrow>=16.1
 - python-gist
 - celluloid
 - jags
