@@ -278,6 +278,7 @@ dependencies:
 - shellcheck
 - pysteps
 - ucx-py
+- ucx==1.15.0
 - geocat-viz
 - icclim
 - py-cordex
@@ -290,5 +291,6 @@ dependencies:
 - regional-mom6
 - u8darts-all
 - xwrf
+- ecmwf-api-client
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
