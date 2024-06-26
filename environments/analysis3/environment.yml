@@ -3,7 +3,6 @@ channels:
 - coecms
 - conda-forge
 - accessnri
-- anaconda
 variables:
   CARTOPY_USER_BACKGROUNDS: /g/data/hh5/public/apps/cartopy-data/backgrounds
 dependencies:
@@ -69,7 +68,7 @@ dependencies:
 - matplotlib
 #- matplotlib>=3.5.2|<=3.4.3  # pinned to solve  https://github.com/matplotlib/matplotlib/issues/21917
 - dreqpy
-- pint<0.24 ### https://github.com/Ouranosinc/xclim/issues/1771
+- pint ###<0.24 ### https://github.com/Ouranosinc/xclim/issues/1771
 - pycodestyle 
 - nc-time-axis
 - jq
@@ -168,7 +167,7 @@ dependencies:
 - rasterstats
 - windrose
 - pyam
-- pyarrow>=16.1
+- pyarrow
 - python-gist
 - celluloid
 - jags
