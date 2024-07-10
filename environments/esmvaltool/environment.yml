@@ -141,6 +141,6 @@ dependencies:
 
   - pip:
       - git+https://github.com/ACCESS-NRI/ESMValCore_ACCESS_dev.git@v2.11.x_access_nri
-      - esmvaltool==2.10.0
+      - esmvaltool==2.11.0
       - sacpy
       - git+https://github.com/rapidsai/ucx-py.git@branch-0.35
