@@ -152,6 +152,7 @@ dependencies:
   - jupyterlab_server
   - jupyter-server-proxy
   - jupyter-resource-usage
+  - nodejs
 
   - pip:
       - git+https://github.com/ACCESS-NRI/ESMValCore_ACCESS_dev.git@v2.11.x_access_nri
