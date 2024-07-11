@@ -79,7 +79,7 @@ function inner() {
     ### Replace things from apps
     for pkg in "${replace_from_apps[@]}"; do
         for dir in bin etc lib include; do
-	    if [[ -d "${dir}" ]]; then
+	        if [[ -d "${dir}" ]]; then
                 pushd $dir
                 apps_subdir=/apps/"${pkg}"/"${dir}"
                 for i in $( find "${apps_subdir}" -type f ); do
@@ -89,7 +89,26 @@ function inner() {
                     ln -sf "${i}" "${fn}"
                 done
                 popd
-	    fi
+	        fi
+        done
+    done
+
+    ### Replace things from somewhere else - note, if 'somewhere else'
+    ### is on /g/data, the path will also need to appear in the
+    ### $outside_files_to_copy array
+    for path in "${replace_with_external[@]}"; do
+        for dir in bin etc lib include; do
+            if [[ -d "${dir}" ]]; then
+                pushd $dir
+                external_subdir="${path}"/"${dir}"
+                for i in $( find "${external_subdir}" -type f ); do
+                    fn="${i//$external_subdir\//}"
+                    [[ -e "${fn}" ]] && rm "${fn}"
+                    [[ "${fn}" != "${fn%/*}" ]] && mkdir -p "${fn%/*}"
+                    ln -sf "${i}" "${fn}"
+                done
+                popd
+            fi
         done
     done
     popd
@@ -152,7 +171,7 @@ fi
 echo "Copying external files"
 for f in "${outside_files_to_copy[@]}"; do
     mkdir -p "${OVERLAY_BASE}"/$( dirname "${f#/g/}" )
-    cp "${f}" "${OVERLAY_BASE}"/"${f#/g/}"
+    cp -r "${f}" "${OVERLAY_BASE}"/"${f#/g/}"
 done
 
 if [[ -e  "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}.sqsh" ]]; then

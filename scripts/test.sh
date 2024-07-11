@@ -66,7 +66,7 @@ popd
 echo "Copying external files"
 for f in "${outside_files_to_copy[@]}"; do
     mkdir -p "${OVERLAY_BASE}"/$( dirname "${f#/g/}" )
-    cp "${f}" "${OVERLAY_BASE}"/"${f#/g/}"
+    cp -r "${f}" "${OVERLAY_BASE}"/"${f#/g/}"
 done
 
 if [[ -e "${CONTAINER_PATH}" ]]; then
