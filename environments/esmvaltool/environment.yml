@@ -7,8 +7,10 @@ channels:
   # - conda-forge/label/esmvalcore_rc
   - coecms
   - conda-forge
-  - access-nri
   - nodefaults
+
+variables:
+  CARTOPY_USER_BACKGROUNDS: /g/data/xp65/public/apps/cartopy-data/backgrounds
 
 dependencies:
   - aiohttp
