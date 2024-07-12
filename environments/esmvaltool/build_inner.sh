@@ -5,6 +5,9 @@ eval "$( ${MAMBA} shell hook --shell bash)"
 micromamba activate "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}"
 set -u
 
+# Fix shebang in esmvaltool 
+sed -i '1s|^#!/.*$|#!/g/data/xp65/public/./apps/med_conda/envs/esmvaltool-0.4/bin/python|' /opt/conda/esmvaltool-0.4/bin/esmvaltool
+
 jupyter lab build
 
 pushd "${CONDA_INSTALLATION_PATH}/envs/${FULLENV}/lib/python3.11/site-packages/esmvaltool"
