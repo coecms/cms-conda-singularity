@@ -11,6 +11,7 @@ channels:
 
 variables:
   CARTOPY_USER_BACKGROUNDS: /g/data/xp65/public/apps/cartopy-data/backgrounds
+  CARTOPY_DATA_DIR: /g/data/xp65/public/apps/cartopy-data
 
 dependencies:
   - aiohttp
