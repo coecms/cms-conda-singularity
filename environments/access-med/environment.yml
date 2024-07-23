@@ -32,7 +32,7 @@ dependencies:
 - access-nri-intake>=0.1.1
 - netcdf4<=1.6.0 ### Workaround for https://github.com/pydata/xarray/issues/7079
 - mo_pack
-- nodejs
+- nodejs>=20.0.0
 - numpy>=1.21, !=1.24.3  # severe masking bug
 - pandas
 - scipy
