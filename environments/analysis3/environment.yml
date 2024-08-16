@@ -291,5 +291,6 @@ dependencies:
 - xwrf
 - ecmwf-api-client
 - pygamma_n
+- numexpr>2.9
 - pip:
   - railroad-diagrams ### Unlisted dependency of pip and pyparsing
